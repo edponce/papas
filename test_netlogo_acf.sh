@@ -1,8 +1,9 @@
 #!/bin/bash
 
 
-DEBUG=1
+DEBUG=0
 PBS_O_WORKDIR=$(pwd)
+SCRATCHDIR="$PBS_O_WORKDIR/workspace"
 
 # Start timer
 tic=$SECONDS
@@ -21,7 +22,7 @@ cd $PBS_O_WORKDIR
 experiment_name="Fire"
 
 # Full path to input directory
-input_dir="$HOME/netlogo/fire"
+input_dir="$PBS_O_WORKDIR/fire"
 
 # Full path and filename of model file (.nlogo)
 model_file="$input_dir/Fire.nlogo"
@@ -40,7 +41,7 @@ work_dir="$SCRATCHDIR/fire"
 
 # Full path to output directory
 # NOTE: Gets created if it does not exists
-output_dir="$input_dir/test"
+output_dir="$input_dir/outputs"
 
 # Filename of combined/unordered output file (.csv)
 # NOTE: Do not provide full path, only the filename.
@@ -49,13 +50,13 @@ output_file="Fire.csv"
 #------------------------------------------------------------------------------
 
 # Full path and filename of NetLogo program (.jar)
-netlogo_prog="$HOME/netlogo/NetLogo_6.0/app/netlogo-6.0.0.jar"
+netlogo_prog="$PBS_O_WORKDIR/NetLogo_6.0/app/netlogo-6.0.0.jar"
 
 # Full path and filename of C++ MPI program
-cpp_prog="$HOME/netlogo/netlogo_mpi"
+cpp_prog="$PBS_O_WORKDIR/netlogo_mpi"
 
 # Full path and filename of Python parser program
-parser_prog="$HOME/netlogo/netlogo_parser.py"
+parser_prog="$PBS_O_WORKDIR/netlogo_parser.py"
 
 
 ############################
@@ -63,14 +64,14 @@ parser_prog="$HOME/netlogo/netlogo_parser.py"
 ############################
 invalid_conf=0
 
-# Validate input directory 
+# Validate input directory
 if [ ! -d "$input_dir" ]; then
     echo "ERROR: input directory does not exists, $input_dir"
     invalid_conf=1
 fi
 
-# Validate model file 
-if [ ! -f "$model_file" ]; then 
+# Validate model file
+if [ ! -f "$model_file" ]; then
     echo "ERROR: model file does not exists, $model_file"
     invalid_conf=1
 fi
@@ -83,26 +84,26 @@ for setup_file in "${setup_files[@]}"; do
     fi
 done
 
-# Validate working directory 
+# Validate working directory
 if [ -d "$work_dir" ]; then
     rm -rf ${work_dir}/*
 else
     mkdir -p $work_dir
 fi
 
-# Validate output directory 
+# Validate output directory
 if [ ! -d "$output_dir" ]; then
     mkdir -p $output_dir
 fi
 
-# Validate NetLogo program 
-if [ ! -f "$netlogo_prog" ]; then 
+# Validate NetLogo program
+if [ ! -f "$netlogo_prog" ]; then
     echo "ERROR: NetLogo program does not exists, $netlogo_prog"
     invalid_conf=1
 fi
 
-# Validate C++ MPI program 
-if [ ! -f "$cpp_prog" ]; then 
+# Validate C++ MPI program
+if [ ! -f "$cpp_prog" ]; then
     echo "ERROR: C++ MPI program does not exists, $cpp_prog"
     invalid_conf=1
 elif [ ! -x "$cpp_prog" ]; then
@@ -110,8 +111,8 @@ elif [ ! -x "$cpp_prog" ]; then
     invalid_conf=1
 fi
 
-# Validate Python parser program 
-if [ ! -f "$parser_prog" ]; then 
+# Validate Python parser program
+if [ ! -f "$parser_prog" ]; then
     echo "ERROR: Python parser program does not exists, $parser_prog"
     invalid_conf=1
 elif [ ! -x "$parser_prog" ]; then
@@ -148,14 +149,12 @@ done
 
 # Calculate number of processes per node
 num_proc=${#setup_files[@]}
-num_hosts=1
-ppn=$num_proc
 
 # Run parallel NetLogo
 if [ $DEBUG -eq 1 ]; then
-    echo "mpirun -np $num_proc -ppn=$ppn -host localhost $cpp_prog $cpp_prog_params"
+    echo "mpirun -np $num_proc $cpp_prog $cpp_prog_params"
 else
-    mpirun -np $num_proc -ppn=$ppn -host localhost $cpp_prog $cpp_prog_params
+    mpirun -np $num_proc $cpp_prog $cpp_prog_params
 fi
 
 

@@ -1,0 +1,14 @@
+<experiments>
+    <experiment name="experiment" repetitions="1" runMetricsEveryStep="true">
+        <setup>setup</setup>
+        <go>go</go>
+        <exitCondition>not any? fires</exitCondition>
+        <metric>burned-trees</metric>
+        <enumeratedValueSet variable="density">
+            <value value="5"/>
+        </enumeratedValueSet>
+        <enumeratedValueSet variable="initial-trees">
+            <value value="15"/>
+        </enumeratedValueSet>
+    </experiment>
+</experiments>

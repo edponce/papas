@@ -38,7 +38,7 @@ int main(int argc, char* argv[])
      * 5-n : setup files
      */
     // NOTE: Assume 1 process per setup file
-    // NOTE: Only processes that have a setup file will run NetLogo 
+    // NOTE: Only processes that have a setup file will run NetLogo
     if ((argc > (numtasks + 5)) || (argc < 6)) {
         if (rank == 0) {
             cout << "ERROR: incorrect number of parameters" << endl;
@@ -46,10 +46,10 @@ int main(int argc, char* argv[])
         }
     } else if (argc > (rank + 5)) {
 
-	// Max memory for NetLogo
-	const string max_memory("16384m");
+        // Max memory for NetLogo
+        const string max_memory("16384m");
 
-        // NetLogo program (.jar) 
+        // NetLogo program (.jar)
         const string netlogo_prog(argv[1]);
 
         // Experiment name
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
 
         const string cmd("java -Xmx" + max_memory + " -Dfile.encoding=UTF-8 -cp " + netlogo_prog + " org.nlogo.headless.Main --experiment " + exp_name + " --model " + model_file + " --setup-file " + setup_file + " --table " + out_file);
 
-	//cout << cmd << endl;
+        //cout << cmd << endl;
         system(cmd.c_str());
     } else {
         cout << hostname << "(" + rank_str.str() + "): no setup file assigned" << endl;
