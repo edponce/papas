@@ -1,6 +1,7 @@
 doc/
-NetLogo_6.0
+NetLogo_6.0/
 ssh_scripts
 hcw_compliance/
 netlogo_mpi
 workspace/
+fire/outputs/

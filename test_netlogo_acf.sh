@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-DEBUG=0
+DEBUG=1
 PBS_O_WORKDIR=$(pwd)
 SCRATCHDIR="$PBS_O_WORKDIR/workspace"
 
