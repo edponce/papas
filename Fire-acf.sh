@@ -7,8 +7,8 @@
 #   * NetLogo_6.0 (real or symlink) should be available in 'mpi_netlogo'
 
 
-# 0 - print configuration, simulate run, and exit
-# 1 - run in localhost
+# 0 - run in localhost
+# 1 - simulate run
 DEBUG=1
 
 # Start timer
