@@ -1,15 +1,22 @@
-#!/bin/bash
+#PBS -S /bin/bash
+#PBS -N Fire
+#PBS -l walltime=00:10:00
+#PBS -l nodes=2
+#PBS -l partition=sigma
 
 
-DEBUG=1
-PBS_O_WORKDIR=$(pwd)
-SCRATCHDIR="$PBS_O_WORKDIR/workspace"
+# This is a sample submission script to run MPI NetLogo in ACF cluster.
+# For this script to work correctly, the following requirements should be satisfied:
+#   * This script should be submitted from 'mpi_netlogo' directory
+#   * NetLogo_6.0 (real or symlink) should be available in 'mpi_netlogo'
+
 
 # Start timer
 tic=$SECONDS
 
 # Load Java module
 module load java
+
 cd $PBS_O_WORKDIR
 
 
@@ -21,27 +28,31 @@ cd $PBS_O_WORKDIR
 # Name of experiment run
 experiment_name="Fire"
 
-# Full path to input directory
-input_dir="$PBS_O_WORKDIR/fire"
+# Full path to top directory of project
+top_dir="$PBS_O_WORKDIR/Fire"
 
 # Full path and filename of model file (.nlogo)
-model_file="$input_dir/Fire.nlogo"
+model_file="$top_dir/Fire.nlogo"
 
 # Full path for all setup files (.xml)
-setup_files_dir="$input_dir"
+setup_files_dir="$top_dir"
 
 # Filename of setup files (.xml)
 # NOTE: For large runs, use multiple files each with a subset of iterations or parameters.
 #       Do not provide full paths, only the filenames.
-setup_files=(Fire1.xml Fire2.xml Fire3.xml)
+setup_files=(
+Fire1.xml
+Fire2.xml
+Fire3.xml
+)
 
 # Full path to working directory
-# NOTE: Working directory is deleted after each run
-work_dir="$SCRATCHDIR/fire"
+# NOTE: Working directory is created/deleted after each run
+work_dir="$SCRATCHDIR/${experiment_name}_workspace"
 
 # Full path to output directory
 # NOTE: Gets created if it does not exists
-output_dir="$input_dir/outputs"
+output_dir="$top_dir/outputs"
 
 # Filename of combined/unordered output file (.csv)
 # NOTE: Do not provide full path, only the filename.
@@ -64,9 +75,9 @@ parser_prog="$PBS_O_WORKDIR/netlogo_parser.py"
 ############################
 invalid_conf=0
 
-# Validate input directory
-if [ ! -d "$input_dir" ]; then
-    echo "ERROR: input directory does not exists, $input_dir"
+# Validate top directory
+if [ ! -d "$top_dir" ]; then
+    echo "ERROR: top directory does not exists, $top_dir"
     invalid_conf=1
 fi
 
@@ -127,7 +138,7 @@ fi
 
 echo
 echo "NetLogo Configuration:"
-echo "  Input directory: $input_dir"
+echo "  Top directory: $top_dir"
 echo "  Working directory: $work_dir"
 echo "  Output directory: $output_dir"
 echo "  Model file: $model_file"
@@ -149,13 +160,17 @@ done
 
 # Calculate number of processes per node
 num_proc=${#setup_files[@]}
+num_hosts=$(cat $PBS_NODEFILE | sort | uniq | wc -l)
+if [ $num_hosts -eq 1 ]; then
+    ppn=$num_proc
+elif [ $num_hosts -lt $num_proc ]; then
+    ppn=$(((num_proc + 1) / num_hosts))
+else
+    ppn=1
+fi
 
 # Run parallel NetLogo
-if [ $DEBUG -eq 1 ]; then
-    echo "mpirun -np $num_proc $cpp_prog $cpp_prog_params"
-else
-    mpirun -np $num_proc $cpp_prog $cpp_prog_params
-fi
+mpirun -np $num_proc -ppn=$ppn -hostfile $PBS_NODEFILE $cpp_prog $cpp_prog_params
 
 
 #####################
@@ -174,16 +189,10 @@ if [ $(ls | wc -l) -gt 0 ]; then
     out_ext="${output_file##*.}"
 
     # Append partial output files into single unordered output file
-    if [ $DEBUG -eq 0 ]; then
-        cat ${out_file}-*.${out_ext} >> $output_file
-    fi
+    cat ${out_file}-*.${out_ext} >> $output_file
 
     # Parse and order output file
-    if [ $DEBUG -eq 1 ]; then
-        echo "$parser_prog -i $output_file -o ${out_file}_ordered.${out_ext}"
-    else
-        $parser_prog -i $output_file -o ${out_file}_ordered.${out_ext}
-    fi
+    $parser_prog -i $output_file -o ${out_file}_ordered.${out_ext}
 
     # Transfer output data from working directory to output directory
     mv -f * $output_dir

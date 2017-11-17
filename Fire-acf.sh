@@ -1,72 +1,72 @@
-#PBS -S /bin/bash
-#PBS -N hcw-compliance 
-#PBS -l walltime=2:00:00
-#PBS -l nodes=4
-#PBS -l partition=sigma
-#PBS -A ACF-UTK0002
-#PBS -M eponcemo@utk.edu
-#PBS -m a
-#PBS -m e
+#!/bin/bash
 
+
+# This is a testing submission script used to validate NetLogo configuration and setup.
+# For this script to work correctly, the following requirements should be satisfied:
+#   * This script should be executed from 'mpi_netlogo' directory
+#   * NetLogo_6.0 (real or symlink) should be available in 'mpi_netlogo'
+
+
+# 0 - print configuration, simulate run, and exit
+# 1 - run in localhost
+DEBUG=1
 
 # Start timer
 tic=$SECONDS
 
 # Load Java module
 module load java
+
+PBS_O_WORKDIR=$(pwd)
 cd $PBS_O_WORKDIR
 
 
 #########################
 #  User NetLogo Config  #
 #########################
-# NOTE: All files and directories must be in a network filesystem accessible from all hosts.
-
 # Name of experiment run
-experiment_name="hcw-compliance-100"
-#experiment_name="hcw-compliance"
+experiment_name="Fire"
 
-# Full path to input directory
-input_dir="$HOME/netlogo/hcw_compliance"
+# Full path to top directory of project
+top_dir="$PBS_O_WORKDIR/Fire"
 
 # Full path and filename of model file (.nlogo)
-model_file="$input_dir/CdiffNov11.nlogo"
+model_file="$top_dir/Fire.nlogo"
 
 # Full path for all setup files (.xml)
-setup_files_dir="$input_dir/runs_100"
+setup_files_dir="$top_dir"
 
 # Filename of setup files (.xml)
 # NOTE: For large runs, use multiple files each with a subset of iterations or parameters.
 #       Do not provide full paths, only the filenames.
 setup_files=(
-hcw_compliance-0.xml
-hcw_compliance-1.xml
-hcw_compliance-2.xml
-hcw_compliance-3.xml
+Fire1.xml
+Fire2.xml
+Fire3.xml
 )
 
 # Full path to working directory
-# NOTE: Working directory is deleted after each run
-work_dir="$SCRATCHDIR/hcw_compliance"
+# NOTE: Working directory is created/deleted after each run
+work_dir="$PBS_O_WORKDIR/${experiment_name}_workspace"
 
 # Full path to output directory
 # NOTE: Gets created if it does not exists
-output_dir="$input_dir/runs_100/outputs_new"
+output_dir="$top_dir/outputs"
 
 # Filename of combined/unordered output file (.csv)
 # NOTE: Do not provide full path, only the filename.
-output_file="hcw-compliance.csv"
+output_file="Fire.csv"
 
 #------------------------------------------------------------------------------
 
 # Full path and filename of NetLogo program (.jar)
-netlogo_prog="$HOME/netlogo/NetLogo_6.0/app/netlogo-6.0.0.jar"
+netlogo_prog="$PBS_O_WORKDIR/NetLogo_6.0/app/netlogo-6.0.0.jar"
 
 # Full path and filename of C++ MPI program
-cpp_prog="$HOME/netlogo/netlogo_mpi"
+cpp_prog="$PBS_O_WORKDIR/netlogo_mpi"
 
 # Full path and filename of Python parser program
-parser_prog="$HOME/netlogo/netlogo_parser.py"
+parser_prog="$PBS_O_WORKDIR/netlogo_parser.py"
 
 
 ############################
@@ -74,14 +74,14 @@ parser_prog="$HOME/netlogo/netlogo_parser.py"
 ############################
 invalid_conf=0
 
-# Validate input directory 
-if [ ! -d "$input_dir" ]; then
-    echo "ERROR: input directory does not exists, $input_dir"
+# Validate top directory
+if [ ! -d "$top_dir" ]; then
+    echo "ERROR: top directory does not exists, $top_dir"
     invalid_conf=1
 fi
 
-# Validate model file 
-if [ ! -f "$model_file" ]; then 
+# Validate model file
+if [ ! -f "$model_file" ]; then
     echo "ERROR: model file does not exists, $model_file"
     invalid_conf=1
 fi
@@ -94,26 +94,26 @@ for setup_file in "${setup_files[@]}"; do
     fi
 done
 
-# Validate working directory 
+# Validate working directory
 if [ -d "$work_dir" ]; then
     rm -rf ${work_dir}/*
 else
     mkdir -p $work_dir
 fi
 
-# Validate output directory 
+# Validate output directory
 if [ ! -d "$output_dir" ]; then
     mkdir -p $output_dir
 fi
 
-# Validate NetLogo program 
-if [ ! -f "$netlogo_prog" ]; then 
+# Validate NetLogo program
+if [ ! -f "$netlogo_prog" ]; then
     echo "ERROR: NetLogo program does not exists, $netlogo_prog"
     invalid_conf=1
 fi
 
-# Validate C++ MPI program 
-if [ ! -f "$cpp_prog" ]; then 
+# Validate C++ MPI program
+if [ ! -f "$cpp_prog" ]; then
     echo "ERROR: C++ MPI program does not exists, $cpp_prog"
     invalid_conf=1
 elif [ ! -x "$cpp_prog" ]; then
@@ -121,8 +121,8 @@ elif [ ! -x "$cpp_prog" ]; then
     invalid_conf=1
 fi
 
-# Validate Python parser program 
-if [ ! -f "$parser_prog" ]; then 
+# Validate Python parser program
+if [ ! -f "$parser_prog" ]; then
     echo "ERROR: Python parser program does not exists, $parser_prog"
     invalid_conf=1
 elif [ ! -x "$parser_prog" ]; then
@@ -137,7 +137,7 @@ fi
 
 echo
 echo "NetLogo Configuration:"
-echo "  Input directory: $input_dir"
+echo "  Top directory: $top_dir"
 echo "  Working directory: $work_dir"
 echo "  Output directory: $output_dir"
 echo "  Model file: $model_file"
@@ -159,17 +159,13 @@ done
 
 # Calculate number of processes per node
 num_proc=${#setup_files[@]}
-num_hosts=$(cat $PBS_NODEFILE | sort | uniq | wc -l)
-if [ $num_hosts -eq 1 ]; then
-    ppn=$num_proc
-elif [ $num_hosts -lt $num_proc ]; then
-    ppn=$(((num_proc + 1) / num_hosts))
-else
-    ppn=1
-fi
 
 # Run parallel NetLogo
-mpirun -np $num_proc -ppn=$ppn -hostfile $PBS_NODEFILE $cpp_prog $cpp_prog_params
+if [ $DEBUG -eq 1 ]; then
+    echo "mpirun -np $num_proc $cpp_prog $cpp_prog_params"
+else
+    mpirun -np $num_proc $cpp_prog $cpp_prog_params
+fi
 
 
 #####################
@@ -188,10 +184,16 @@ if [ $(ls | wc -l) -gt 0 ]; then
     out_ext="${output_file##*.}"
 
     # Append partial output files into single unordered output file
-    cat ${out_file}-*.${out_ext} >> $output_file
+    if [ $DEBUG -eq 0 ]; then
+        cat ${out_file}-*.${out_ext} >> $output_file
+    fi
 
     # Parse and order output file
-    $parser_prog -i $output_file -o ${out_file}_ordered.${out_ext}
+    if [ $DEBUG -eq 1 ]; then
+        echo "$parser_prog -i $output_file -o ${out_file}_ordered.${out_ext}"
+    else
+        $parser_prog -i $output_file -o ${out_file}_ordered.${out_ext}
+    fi
 
     # Transfer output data from working directory to output directory
     mv -f * $output_dir
