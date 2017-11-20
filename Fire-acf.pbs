@@ -172,27 +172,18 @@ cpp_prog_params="$java_max_memory $netlogo_prog $experiment_name $model_file $wo
 echo
 echo "Launching $num_proc Parallel NetLogo Jobs"
 
-# Create host file
-#host_file=$work_dir/hosts
-#cat $PBS_NODEFILE | sort | uniq > $host_file
-
 # Calculate number of processes per node
-#num_hosts=$(cat $host_file | wc -l)
-#if [ $num_hosts -eq 1 ]; then
-#    ppn=$num_proc
-#elif [ $num_hosts -lt $num_proc ]; then
-#    ppn=$(((num_proc + 1) / num_hosts))
-#else
-#    ppn=1
-#fi
+num_hosts=$(cat $PBS_NODEFILE | sort | uniq | wc -l)
+if [ $num_hosts -eq 1 ]; then
+    ppn=$num_proc
+elif [ $num_hosts -lt $num_proc ]; then
+    ppn=$(((num_proc + 1) / num_hosts))
+else
+    ppn=1
+fi
 
 # Run parallel NetLogo
-#mpirun -np $num_proc -ppn=$ppn -hostfile $host_file $cpp_prog $cpp_prog_params
-
-# Create comma separated list of hosts
-hosts_list="$(cat $PBS_NODEFILE | sort | uniq | paste -sd ',' -)"
-
-mpirun -np $num_proc -hosts $hosts_list $cpp_prog $cpp_prog_params
+mpirun -np $num_proc -ppn=$ppn -hostfile $PBS_NODEFILE $cpp_prog $cpp_prog_params
 
 
 #####################
@@ -215,12 +206,17 @@ if [ $(ls | wc -l) -gt 0 ]; then
 
     # Parse unordered output file and generate combined ordered output file
     $parser_prog -i $output_file -o ${out_file}_ordered.${out_ext}
-
-    # Transfer output data from working directory to output directory
-    mv -f * $output_dir
 else
     echo "ERROR: no output files were generated"
 fi
+
+echo
+echo "Transferring data from working to output directory"
+echo "  Working directory: $work_dir"
+echo "  Output directory:  $output_dir"
+
+# Transfer output data from working directory to output directory
+mv -f * $output_dir
 
 # Move to submission directory and clean working directory
 cd $PBS_O_WORKDIR

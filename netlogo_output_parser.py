@@ -62,7 +62,7 @@ def processNetLogoCSV(infile='', outfile=''):
 
     infile = os.path.abspath(infile)
 
-    print('NetLogo Parser is processing data...')
+    print('NetLogo Output Parser is processing data...')
     print('  Input file:   ' + infile)
     print('  Output file:  ' + outfile)
 
