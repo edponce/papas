@@ -38,8 +38,11 @@ model_file="$top_dir/Fire.nlogo"
 setup_files_dir="$top_dir"
 
 # Filename of setup files (.xml)
-# NOTE: For large runs, use multiple files each with a subset of iterations or parameters.
-#       Do not provide full paths, only the filenames.
+# NOTE: Do not provide full paths, only the filenames.
+# 1. For runs with many parameters, use different files,
+#    each with a subset of parameters.
+# 2. For runs with same parameters but many iterations,
+#    use multiple times a single file with a subset of iterations.
 setup_files=(
 Fire1.xml
 Fire2.xml
@@ -62,6 +65,9 @@ output_file="Fire.csv"
 
 # Full path and filename of NetLogo program (.jar)
 netlogo_prog="$PBS_O_WORKDIR/NetLogo_6.0/app/netlogo-6.0.0.jar"
+
+# Java max heap memory allowed (k = KB, m = MB, g = GB)
+java_max_memory="16g"
 
 # Full path and filename of C++ MPI program
 cpp_prog="$PBS_O_WORKDIR/netlogo_mpi"
@@ -88,12 +94,17 @@ if [ ! -f "$model_file" ]; then
 fi
 
 # Validate setup files
-for setup_file in "${setup_files[@]}"; do
-    if [ ! -f "$setup_files_dir/$setup_file" ]; then
-        echo "ERROR: setup file does not exists, $setup_files_dir/$setup_file"
-        invalid_conf=1
-    fi
-done
+if [ ${#setup_files[@]} -lt 1 ]; then
+    echo "ERROR: no setup file was provided"
+    invalid_conf=1
+else
+    for setup_file in "${setup_files[@]}"; do
+        if [ ! -f "$setup_files_dir/$setup_file" ]; then
+            echo "ERROR: setup file does not exists, $setup_files_dir/$setup_file"
+            invalid_conf=1
+        fi
+    done
+fi
 
 # Validate working directory
 if [ -d "$work_dir" ]; then
@@ -138,46 +149,57 @@ fi
 
 echo
 echo "NetLogo Configuration:"
-echo "  Top directory: $top_dir"
-echo "  Working directory: $work_dir"
-echo "  Output directory: $output_dir"
-echo "  Model file: $model_file"
-echo "  Setup files: ${setup_files[@]}"
-echo "  Output file: $output_file"
+echo "  Java max memory:       $java_max_memory"
+echo "  NetLogo program:       $netlogo_prog"
+echo "  Experiment name:       $experiment_name"
+echo "  Model file:            $model_file"
+echo "  Setup files directory: $setup_files_dir"
+echo "  Setup files:           ${setup_files[@]}"
+echo "  Working directory:     $work_dir"
+echo "  Output directory:      $output_dir"
+echo "  Combined output file:  $output_file"
 
 
 #########################
 #  Launch NetLogo Runs  #
 #########################
-echo
-echo "Launching Parallel NetLogo"
+# Calculate number of MPI processes
+num_proc=${#setup_files[@]}
 
 # Build command line for C++ MPI program, order of parameters matters (see netlogo_mpi.cpp)
-cpp_prog_params="$netlogo_prog $experiment_name $model_file $work_dir/$output_file"
-for setup_file in "${setup_files[@]}"; do
-    cpp_prog_params+=" $setup_files_dir/$setup_file"
-done
+cpp_prog_params="$java_max_memory $netlogo_prog $experiment_name $model_file $work_dir/$output_file $setup_files_dir ${setup_files[@]}"
+
+echo
+echo "Launching $num_proc Parallel NetLogo Jobs"
+
+# Create host file
+#host_file=$work_dir/hosts
+#cat $PBS_NODEFILE | sort | uniq > $host_file
 
 # Calculate number of processes per node
-num_proc=${#setup_files[@]}
-num_hosts=$(cat $PBS_NODEFILE | sort | uniq | wc -l)
-if [ $num_hosts -eq 1 ]; then
-    ppn=$num_proc
-elif [ $num_hosts -lt $num_proc ]; then
-    ppn=$(((num_proc + 1) / num_hosts))
-else
-    ppn=1
-fi
+#num_hosts=$(cat $host_file | wc -l)
+#if [ $num_hosts -eq 1 ]; then
+#    ppn=$num_proc
+#elif [ $num_hosts -lt $num_proc ]; then
+#    ppn=$(((num_proc + 1) / num_hosts))
+#else
+#    ppn=1
+#fi
 
 # Run parallel NetLogo
-mpirun -np $num_proc -ppn=$ppn -hostfile $PBS_NODEFILE $cpp_prog $cpp_prog_params
+#mpirun -np $num_proc -ppn=$ppn -hostfile $host_file $cpp_prog $cpp_prog_params
+
+# Create comma separated list of hosts
+hosts_list="$(cat $PBS_NODEFILE | sort | uniq | paste -sd ',' -)"
+
+mpirun -np $num_proc -hosts $hosts_list $cpp_prog $cpp_prog_params
 
 
 #####################
 #  Combine Outputs  #
 #####################
 echo
-echo "Post-processing NetLogo Outputs ($output_dir)"
+echo "Post-processing NetLogo Outputs"
 
 # Move to working directory
 # NOTE: The following commands require we are in $work_dir, no full paths and filenames
@@ -188,16 +210,16 @@ if [ $(ls | wc -l) -gt 0 ]; then
     out_file="${output_file%.*}"
     out_ext="${output_file##*.}"
 
-    # Append partial output files into single unordered output file
+    # Combine partial output files into a single unordered output file
     cat ${out_file}-*.${out_ext} >> $output_file
 
-    # Parse and order output file
+    # Parse unordered output file and generate combined ordered output file
     $parser_prog -i $output_file -o ${out_file}_ordered.${out_ext}
 
     # Transfer output data from working directory to output directory
     mv -f * $output_dir
 else
-    echo "WARN: no output files were generated"
+    echo "ERROR: no output files were generated"
 fi
 
 # Move to submission directory and clean working directory
@@ -215,6 +237,6 @@ hrs=$((walltime / 3600))
 mins=$(((walltime % 3600) / 60))
 secs=$(((walltime % 3600) % 60))
 echo
-echo "NetLogo job completed in $hrs h, $mins m, $secs s"
+echo "Job completed in $hrs h, $mins m, $secs s"
 echo
 

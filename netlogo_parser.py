@@ -38,13 +38,13 @@ def parseArgs():
     if os.path.isfile(args.infile):
         infile = os.path.abspath(args.infile)
     else:
-        print('ERROR: input file to parse was not given/found: ' + args.infile)
+        print('ERROR: input file does not exist, ' + args.infile)
         return False
 
     if args.outfile:
         outfile = args.outfile
     else:
-        print('ERROR: invalid output file given: ' + args.outfile)
+        print('ERROR: no output file was provided')
         return False
 
     return True
@@ -56,7 +56,8 @@ Write parsed data to output file
 '''
 def processNetLogoCSV(ifile='', ofile=''):
 
-    print('Loading NetLogo data from input file: ' + ifile)
+    print('NetLogo Parser is processing data...')
+    print('  Input file:   ' + ifile)
 
     header_data = []
     raw_data = []
@@ -126,13 +127,13 @@ def processNetLogoCSV(ifile='', ofile=''):
     sort_data = sorted(raw_data, key=lambda x: (x[run_number_col + 1:step_col + 1]))
 
     # Pretty print file stats
-    print
-    print('Header lines: ' + str(len(header_data)))
-    print('Data columns: ' + str(num_data_cols))
-    print('Data lines: ' + str(len(sort_data)))
+    print('  Header lines: ' + str(len(header_data)))
+    print('  Data columns: ' + str(num_data_cols))
+    print('  Data lines:   ' + str(len(sort_data)))
 
     # Write ordered data to output file
-    print('Saving NetLogo data into output file: ' + ofile)
+    print('NetLogo Parser is saving data...')
+    print('  Output file:  ' + ofile)
     with open(ofile, 'w') as f:
         # Write header data
         for line in header_data:
