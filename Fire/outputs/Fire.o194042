@@ -1,0 +1,44 @@
+
+NetLogo Configuration:
+  Java max memory:       16g
+  NetLogo program:       /nics/d/home/eponcemo/netlogo/mpi_netlogo/NetLogo_6.0/app/netlogo-6.0.0.jar
+  Experiment name:       Fire
+  Model file:            /nics/d/home/eponcemo/netlogo/mpi_netlogo/Fire/Fire.nlogo
+  Setup files directory: /nics/d/home/eponcemo/netlogo/mpi_netlogo/Fire
+  Setup files:           Fire.xml Fire.xml
+  Working directory:     /lustre/haven/user/eponcemo/Fire_workspace
+  Output directory:      /nics/d/home/eponcemo/netlogo/mpi_netlogo/Fire/outputs
+  Combined output file:  Fire.csv
+
+Launching 2 Parallel NetLogo Jobs
+  acf-sc042 (0):
+    Java max memory:     16g
+    NetLogo program:     /nics/d/home/eponcemo/netlogo/mpi_netlogo/NetLogo_6.0/app/netlogo-6.0.0.jar
+    Experiment name:     Fire-0
+    Model file:          /nics/d/home/eponcemo/netlogo/mpi_netlogo/Fire/Fire.nlogo
+    Setup file:          /nics/d/home/eponcemo/netlogo/mpi_netlogo/Fire/Fire.xml
+    Partial output file: /lustre/haven/user/eponcemo/Fire_workspace/Fire-0.csv
+
+  acf-sc113 (1):
+    Java max memory:     16g
+    NetLogo program:     /nics/d/home/eponcemo/netlogo/mpi_netlogo/NetLogo_6.0/app/netlogo-6.0.0.jar
+    Experiment name:     Fire-1
+    Model file:          /nics/d/home/eponcemo/netlogo/mpi_netlogo/Fire/Fire.nlogo
+    Setup file:          /nics/d/home/eponcemo/netlogo/mpi_netlogo/Fire/Fire.xml
+    Partial output file: /lustre/haven/user/eponcemo/Fire_workspace/Fire-1.csv
+
+
+Post-processing NetLogo Outputs
+NetLogo Output Parser is processing data...
+  Input file:   /lustre/haven/user/eponcemo/Fire_workspace/Fire.csv
+  Output file:  Fire_ordered.csv
+  Header lines: 7
+  Data columns: 5
+  Data lines:   30
+
+Transferring data from working to output directory
+  Working directory: /lustre/haven/user/eponcemo/Fire_workspace
+  Output directory:  /nics/d/home/eponcemo/netlogo/mpi_netlogo/Fire/outputs
+
+Job completed in 0 h, 0 m, 8 s
+

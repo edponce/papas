@@ -1,15 +1,18 @@
-#!/bin/bash
+#PBS -S /bin/bash
+#PBS -N Fire
+#PBS -l walltime=01:00:00
+#PBS -l nodes=2
+#PBS -l partition=sigma
+#PBS -M eponcemo@utk.edu
+#PBS -m a
+#PBS -m e
 
 
-# This is a testing submission script used to validate NetLogo configuration and setup.
+# This is a sample submission script to run MPI NetLogo in ACF cluster.
 # For this script to work correctly, the following requirements should be satisfied:
-#   * This script should be executed from 'mpi_netlogo' directory
+#   * This script should be submitted from 'mpi_netlogo' directory
 #   * NetLogo_6.0 (real or symlink) should be available in 'mpi_netlogo'
 
-
-# 0 - run in localhost
-# 1 - simulate run
-DEBUG=1
 
 # Start timer
 tic=$SECONDS
@@ -17,18 +20,19 @@ tic=$SECONDS
 # Load Java module
 module load java
 
-PBS_O_WORKDIR=$(pwd)
 cd $PBS_O_WORKDIR
 
 
 #########################
 #  User NetLogo Config  #
 #########################
+# NOTE: All files and directories must be in a network filesystem accessible from all hosts.
+
 # Name of experiment run
 experiment_name="Fire"
 
 # Full path to top directory of project
-top_dir="$PBS_O_WORKDIR/Fire"
+top_dir="$PBS_O_WORKDIR"
 
 # Full path and filename of model file (.nlogo)
 model_file="$top_dir/Fire.nlogo"
@@ -40,17 +44,21 @@ setup_files_dir="$top_dir"
 # NOTE: Do not provide full paths, only the filenames.
 # 1. For runs with many parameters, use different files,
 #    each with a subset of parameters.
+#setup_files=(
+#Fire1.xml
+#Fire2.xml
+#Fire3.xml
+#)
 # 2. For runs with same parameters but many iterations,
 #    use multiple times a single file with a subset of iterations.
 setup_files=(
-Fire1.xml
-Fire2.xml
-Fire3.xml
+Fire.xml
+Fire.xml
 )
 
 # Full path to working directory
 # NOTE: Working directory is created/deleted after each run
-work_dir="$PBS_O_WORKDIR/${experiment_name}_workspace"
+work_dir="$SCRATCHDIR/${experiment_name}_workspace"
 
 # Full path to output directory
 # NOTE: Gets created if it does not exists
@@ -63,16 +71,16 @@ output_file="Fire.csv"
 #------------------------------------------------------------------------------
 
 # Full path and filename of NetLogo program (.jar)
-netlogo_prog="$PBS_O_WORKDIR/NetLogo_6.0/app/netlogo-6.0.0.jar"
+netlogo_prog="$HOME/netlogo/mpi_netlogo/NetLogo_6.0/app/netlogo-6.0.0.jar"
 
 # Java max heap memory allowed (k = KB, m = MB, g = GB)
 java_max_memory="16g"
 
 # Full path and filename of C++ MPI program
-cpp_prog="$PBS_O_WORKDIR/netlogo_mpi"
+cpp_prog="$HOME/netlogo/mpi_netlogo/netlogo_mpi"
 
 # Full path and filename of Python parser program
-parser_prog="$PBS_O_WORKDIR/netlogo_output_parser.py"
+parser_prog="$HOME/netlogo/mpi_netlogo/netlogo_output_parser.py"
 
 
 ############################
@@ -155,8 +163,8 @@ echo "  Model file:            $model_file"
 echo "  Setup files directory: $setup_files_dir"
 echo "  Setup files:           ${setup_files[@]}"
 echo "  Working directory:     $work_dir"
-echo "  Combined output file:  $output_file"
 echo "  Output directory:      $output_dir"
+echo "  Combined output file:  $output_file"
 
 
 #########################
@@ -171,12 +179,18 @@ cpp_prog_params="$java_max_memory $netlogo_prog $experiment_name $model_file $wo
 echo
 echo "Launching $num_proc Parallel NetLogo Jobs"
 
-# Run parallel NetLogo
-if [ $DEBUG -eq 1 ]; then
-    echo "mpirun -np $num_proc $cpp_prog $cpp_prog_params"
+# Calculate number of processes per node
+num_hosts=$(cat $PBS_NODEFILE | sort | uniq | wc -l)
+if [ $num_hosts -eq 1 ]; then
+    ppn=$num_proc
+elif [ $num_hosts -lt $num_proc ]; then
+    ppn=$(((num_proc + 1) / num_hosts))
 else
-    mpirun -np $num_proc $cpp_prog $cpp_prog_params
+    ppn=1
 fi
+
+# Run parallel NetLogo
+mpirun -np $num_proc -ppn=$ppn -hostfile $PBS_NODEFILE $cpp_prog $cpp_prog_params
 
 
 #####################
@@ -193,19 +207,22 @@ cd $work_dir
 if [ $(ls | wc -l) -gt 0 ]; then
     out_file="${output_file%.*}"
     out_ext="${output_file##*.}"
+    output_ordered_file="${out_file}_ordered.${out_ext}"
 
-    if [ $DEBUG -eq 1 ]; then
-        echo "$parser_prog -i $output_file -o ${out_file}_ordered.${out_ext}"
-    else
-        # Combine partial output files into a single unordered output file
-        cat ${out_file}-*.${out_ext} >> $output_file
+    # Combine partial output files into a single unordered output file
+    cat ${out_file}-*.${out_ext} >> $output_file
 
-        # Parse unordered output file and generate combined ordered output file
-        $parser_prog -i $output_file -o ${out_file}_ordered.${out_ext}
+    # Parse unordered output file and generate combined ordered output file
+    $parser_prog -i $output_file -o $output_ordered_file
 
-        # Transfer output data from working directory to output directory
-        mv -f * $output_dir
-    fi
+    echo
+    echo "Transferring data from working to output directory"
+    echo "  Output ordered file: $output_ordered_file"
+    echo "  Working directory:   $work_dir"
+    echo "  Output directory:    $output_dir"
+
+    # Transfer output data from working directory to output directory
+    mv -f $output_file $output_ordered_file $output_dir
 else
     echo "ERROR: no output files were generated"
 fi
