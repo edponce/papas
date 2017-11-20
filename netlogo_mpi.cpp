@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
     // NOTE: Only processes that have a setup file will run NetLogo
     if ((argc > (numtasks + 7)) || (argc < 8)) {
         if (rank == 0) {
-            cout << "ERROR: incorrect number of parameters" << endl << endl;
             cout << "Usage: " + string(argv[0]) + " [java_max_heap] [netlogo_prog] [experiment_name] [model_file] [output_file] [setup_files_directory] [setup_file1 setup_file2 ...]" << endl << endl;
+            cout << "ERROR: incorrect number of parameters" << endl;
         }
     } else if (argc > (rank + 7)) {
 

@@ -1,7 +1,9 @@
 #!/usr/bin/python2
 
+import sys
 import os
 import argparse
+from argparse import RawTextHelpFormatter
 
 
 # NOTE: The following are requirements/assumptions to enable correct processing
@@ -15,49 +17,54 @@ import argparse
 
 
 # Global variables
-infile = ''
-outfile = ''
 run_number_colstr = '[run number]'
 step_colstr = '[step]'
 
 
-'''
-Parse command line arguments
-'''
 def parseArgs():
+    '''
+    Parse command line arguments
+    '''
 
-    parser = argparse.ArgumentParser(prog='NetLogoParser', description='Parse and order data from a combined/unordered NetLogo output .csv file')
+    parser = argparse.ArgumentParser(prog=__file__, description='NetLogo Output Parser:\n'
+             'Parse and order data from a combined/unordered NetLogo output .csv file',
+             formatter_class=RawTextHelpFormatter)
 
-    parser.add_argument('-i', '--infile', type=str, default='', dest='infile', help='NetLogo .csv file with combined/unordered data')
-    parser.add_argument('-o', '--outfile', type=str, default='netlogo_ordered.csv', dest='outfile', help='NetLogo .csv file with ordered data (default is netlogo_ordered.csv')
+    parser.add_argument('-i', '--infile', type=str, dest='infile',
+                        default='',
+                        help='NetLogo .csv file with combined/unordered data')
+    parser.add_argument('-o', '--outfile', type=str, dest='outfile',
+                        default='netlogo_ordered.csv',
+                        help='NetLogo .csv file with ordered data\n'
+                             '(default is netlogo_ordered.csv)')
 
     args = parser.parse_args()
 
-    global infile, outfile
-
-    if os.path.isfile(args.infile):
-        infile = os.path.abspath(args.infile)
-    else:
+    # Validate options
+    err = 0
+    if not os.path.isfile(args.infile):
         print('ERROR: input file does not exist, ' + args.infile)
-        return False
+        err = 1
 
-    if args.outfile:
-        outfile = args.outfile
-    else:
-        print('ERROR: no output file was provided')
-        return False
+    if err != 0:
+        print
+        parser.print_help()
+        sys.exit(os.EX_USAGE)
 
-    return True
+    return args
 
 
 '''
 Load, parse, and order data from NetLogo .csv file
 Write parsed data to output file
 '''
-def processNetLogoCSV(ifile='', ofile=''):
+def processNetLogoCSV(infile='', outfile=''):
+
+    infile = os.path.abspath(infile)
 
     print('NetLogo Parser is processing data...')
-    print('  Input file:   ' + ifile)
+    print('  Input file:   ' + infile)
+    print('  Output file:  ' + outfile)
 
     header_data = []
     raw_data = []
@@ -78,7 +85,7 @@ def processNetLogoCSV(ifile='', ofile=''):
     step_col = 0  # identify column with 'step' value
 
     # Process file line-by-line
-    with open(ifile) as f:
+    with open(infile) as f:
         for line in f:
             # Remove whitespace and quotes from input
             line = line.strip()
@@ -132,9 +139,7 @@ def processNetLogoCSV(ifile='', ofile=''):
     print('  Data lines:   ' + str(len(sort_data)))
 
     # Write ordered data to output file
-    print('NetLogo Parser is saving data...')
-    print('  Output file:  ' + ofile)
-    with open(ofile, 'w') as f:
+    with open(outfile, 'w') as f:
         # Write header data
         for line in header_data:
             f.write('%s\n' % ','.join(line))
@@ -152,6 +157,6 @@ def processNetLogoCSV(ifile='', ofile=''):
 Main entry point
 '''
 if __name__ == "__main__":
-    if parseArgs():
-        processNetLogoCSV(infile, outfile)
+    args = parseArgs()
+    processNetLogoCSV(args.infile, args.outfile)
 

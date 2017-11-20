@@ -73,7 +73,7 @@ java_max_memory="16g"
 cpp_prog="$PBS_O_WORKDIR/netlogo_mpi"
 
 # Full path and filename of Python parser program
-parser_prog="$PBS_O_WORKDIR/netlogo_parser.py"
+parser_prog="$PBS_O_WORKDIR/netlogo_output_parser.py"
 
 
 ############################
