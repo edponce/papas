@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
         cout << "  " + hostname + " (" + rank_str.str() + "):" +
 		"\n    Java max memory:     " + max_memory +
 		"\n    NetLogo program:     " + netlogo_prog +
-	        "\n    Experiment name:     " + exp_name +
+	    "\n    Experiment name:     " + exp_name +
 		"\n    Model file:          " + model_file +
 		"\n    Setup file:          " + setup_file +
 		"\n    Partial output file: " + out_file + "\n\n";

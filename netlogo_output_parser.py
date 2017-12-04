@@ -19,6 +19,7 @@ from argparse import RawTextHelpFormatter
 # Global variables
 run_number_colstr = '[run number]'
 step_colstr = '[step]'
+parser = object()
 
 
 def parseArgs():
@@ -44,7 +45,7 @@ def parseArgs():
     err = 0
     if not os.path.isfile(args.infile):
         print('ERROR: input file does not exist, ' + args.infile)
-        err = 1
+        err += 1
 
     if err != 0:
         print
