@@ -41,7 +41,7 @@ def parseArgs():
                         help='Directory of setup files')
 
     parser.add_argument('-s', '--setupfiles', type=str, dest='setup_files',
-                        default='', nargs='+',
+                        default='', nargs='+', metavar=('S1', 'S2'),
                         help='Setup files (without last slash)')
 
     args = parser.parse_args()
@@ -85,13 +85,6 @@ def parseArgs():
         sys.exit(os.EX_USAGE)
 
     return args
-
-
-def printArgs(args=None):
-    '''
-    Print command line arguments
-    '''
-    print
 
 
 '''

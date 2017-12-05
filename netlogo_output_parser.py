@@ -19,14 +19,12 @@ from argparse import RawTextHelpFormatter
 # Global variables
 run_number_colstr = '[run number]'
 step_colstr = '[step]'
-parser = object()
 
 
 def parseArgs():
     '''
     Parse command line arguments
     '''
-
     parser = argparse.ArgumentParser(prog=__file__, description='NetLogo Output Parser:\n'
              'Parse and order data from a combined/unordered NetLogo output .csv file',
              formatter_class=RawTextHelpFormatter)
@@ -55,12 +53,11 @@ def parseArgs():
     return args
 
 
-'''
-Load, parse, and order data from NetLogo .csv file
-Write parsed data to output file
-'''
 def processNetLogoCSV(infile='', outfile=''):
-
+    '''
+    Load, parse, and order data from NetLogo .csv file
+    Write parsed data to output file
+    '''
     infile = os.path.abspath(infile)
 
     print('NetLogo Output Parser is processing data...')

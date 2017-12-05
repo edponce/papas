@@ -1,0 +1,31 @@
+{
+    "program1" : "netlogo_mpi.py",
+    "params1" :
+    {
+        "-p" : "2g",
+        "-n" : "NetLogo_6.0",
+        "-e" : "PaPaS Test",
+        "-m" : "examples/Fire/Fire.nlogo",
+        "-o" : "erase_me.csv",
+        "-d" : "examples/Fire",
+        "-s" : ["Fire1.xml", "Fire2.xml"]
+    },
+
+    "program2" : "",
+
+    "program3" : "",
+    "params3" :
+    {
+        "-i" : "",
+        "-o" : ""
+    },
+
+
+    "dependences" :
+    {
+        "program1" : "program2",
+        "program3" : "program1"
+    }
+}
+
+
