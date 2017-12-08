@@ -64,7 +64,7 @@ def processJSONfile(jsonfile=''):
             cmd.append(vals)
 
     print ' '.join(cmd)
-    #subprocess.Popen(cmd)
+    subprocess.Popen(cmd)
 
 
 '''
