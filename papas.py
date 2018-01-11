@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 import sys
 import os
@@ -13,23 +13,23 @@ def parseArgs():
     Parse command line arguments
     '''
     parser = argparse.ArgumentParser(prog=__file__,
-             description='NetLogo JSON Parser: parse JSON configuration file',
+             description='JSON Parser: parse JSON configuration file',
              formatter_class=RawTextHelpFormatter)
 
     parser.add_argument('-j', '--jsonfile', type=str, dest='jsonfile',
                         default='',
-                        help='NetLogo JSON configuration file')
+                        help='JSON configuration file')
 
     args = parser.parse_args()
 
     # Validate options
     err = 0
     if not os.path.isfile(args.jsonfile):
-        print 'ERROR: JSON configuration file does not exist, ' + args.jsonfile
+        print('ERROR: JSON configuration file does not exist, ' + args.jsonfile)
         err += 1
 
     if err != 0:
-        print
+        print()
         parser.print_help()
         sys.exit(os.EX_USAGE)
 
@@ -52,9 +52,13 @@ def processJSONfile(jsonfile=''):
 
     # Check for extensions to auto-detect C/C++/Python/Java/etc.
     # Append ./ only if single word and it is an executable
-    cmd.append('./' + config['program1'])
+    prog_name = config['program1']
+    if os.access(prog_name, os.X_OK):
+        cmd.append('./' + prog_name)
+    else:
+        cmd.append(prog_name)
 
-    for param, vals in config['params1'].iteritems():
+    for param, vals in config['params1'].items():
         if isinstance(vals, list) and len(vals) > 1:
             for val in vals:
                 cmd.append(param)
@@ -63,8 +67,8 @@ def processJSONfile(jsonfile=''):
             cmd.append(param)
             cmd.append(vals)
 
-    print ' '.join(cmd)
-    subprocess.Popen(cmd)
+    print(' '.join(cmd))
+    subprocess.run(cmd)
 
 
 '''

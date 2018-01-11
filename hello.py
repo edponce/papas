@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 import sys
 import os
@@ -23,7 +23,7 @@ def parseArgs():
     err = 0
 
     if err != 0:
-        print
+        print()
         parser.print_help()
         sys.exit(os.EX_USAGE)
 
@@ -36,7 +36,7 @@ Main entry point
 if __name__ == "__main__":
     args = parseArgs()
     if args.x > 1:
-        print 'Hello, world'
+        print('Hello, world')
     else:
-        print 'Goodbye, world'
+        print('Goodbye, world')
 
