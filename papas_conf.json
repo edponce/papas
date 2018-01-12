@@ -1,0 +1,18 @@
+{
+    "program_extensions":
+    {
+        "COMMENTS": "Key-value pairs represent file extension with default program to run. An empty program value represents an executable file (e.g., compiled languages). These are only used if program is not provided in application's configuration.",
+        "py": "python",
+        "java": "java",
+        "jar": "java -jar",
+        "c": "",
+        "cpp": "",
+        "f": "",
+        "f90": "",
+        "bin": "",
+        "sh": "sh",
+        "bash": "bash",
+        "zsh": "zsh",
+        "m" : "matlab -nodisplay -nojvm -r"
+    }
+}
