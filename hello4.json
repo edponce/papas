@@ -1,0 +1,8 @@
+{
+    "program": "/home/edponce/Documents/utk/netlogo/mpi_netlogo/hello.py",
+    "params":
+    {
+        "--xparam": "10"
+    }
+}
+

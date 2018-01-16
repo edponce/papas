@@ -8,18 +8,64 @@ import subprocess
 import json
 
 
-def parseArgs():
+default_papas_conf_file = 'papas_conf.json'
+
+
+def print_log(msg='', *, end='\n', file=sys.stdout):
     '''
-    Parse command line arguments
+    Print messages.
+
+    Keyword arguments:
+        msg -- info to print
+
+    Keyword-only arguments:
+        end -- string to print at end of message
+        file -- file descriptor for output
+    '''
+    print(msg, end=end, file=file)
+
+
+def warn_log(msg='', *, end='\n', file=sys.stdout):
+    '''
+    Print warning messages.
+
+    Keyword arguments:
+        msg -- info to print
+
+    Keyword-only arguments:
+        end -- string to print at end of message
+        file -- file descriptor for output
+    '''
+    print('WARN: ' + msg, end=end, file=file)
+
+
+def error_log(msg='', *, end='\n', file=sys.stderr):
+    '''
+    Print error messages.
+
+    Keyword arguments:
+        msg -- info to print
+
+    Keyword-only arguments:
+        end -- string to print at end of message
+        file -- file descriptor for output
+    '''
+    print('ERROR: ' + msg, end=end, file=file)
+
+
+def parse_args():
+    '''
+    Parse and validate command line arguments.
+    Returns argparse.Namespace object.
     '''
     parser = argparse.ArgumentParser(prog=__file__,
-             description='JSON Parser: parse JSON configuration file',
+             description='PaPaS: Framework for parallel parameter studies',
              formatter_class=RawTextHelpFormatter)
 
     parser.add_argument('-c', '--conf', type=str, dest='papas_conf_file',
-                        default='papas_conf.json',
+                        default=default_papas_conf_file,
                         help='PaPaS JSON configuration file\n'
-                             'Default is papas_conf.json')
+                             'Default is \'' + default_papas_conf_file + '\'')
 
     parser.add_argument('-a', '--app', type=str, dest='app_conf_file',
                         default='',
@@ -29,39 +75,104 @@ def parseArgs():
 
     # Validate options
     err = 0
-    if not os.path.isfile(args.app_conf_file):
-        print('ERROR: Application JSON configuration file does not exist, ' + args.app_conf_file)
+    if not validate_path(args.papas_conf_file, read=True):
         err += 1
 
-    if not os.path.isfile(args.papas_conf_file):
-        print('ERROR: PaPaS JSON configuration file does not exist, ' + args.papas_conf_file)
+    if not validate_path(args.app_conf_file, read=True):
         err += 1
 
-    if err != 0:
-        print()
+    if err:
+        print_log()
         parser.print_help()
         sys.exit(os.EX_USAGE)
 
     return args
 
 
-def loadConfData(conf_file=''):
+def validate_path(apath, *, file=True, read=False, write=False, execute=False):
     '''
-    Load a JSON configuration file
+    Check access properties of a given file or directory, if it exists.
+    Returns True or False.
+
+    Positional arguments:
+        apath -- file or directory to check
+
+    Keyword-only arguments:
+        file -- specify if it is a file or directory (default is True)
+        read -- check if path is readable (default is False)
+        write -- check if path is writeable (default is False)
+        execute -- check if path is executable (default is False)
     '''
-    conf_data = {}
-    with open(os.path.abspath(conf_file), 'r') as f:
-        conf_data = json.load(f)
+    prop_msg = []
+    if file and not os.path.isfile(apath):
+        prop_msg += ['file does not exists']
+    elif not file and not os.path.isdir(apath):
+        prop_msg += ['directory does not exists']
+    else:
+        if read and not os.access(apath, os.R_OK):
+            prop_msg += ['is not readable']
+        if write and not os.access(apath, os.W_OK):
+            prop_msg += ['is not writable']
+        if execute and not os.access(apath, os.X_OK):
+            prop_msg += ['is not executable']
 
-    return conf_data
+    if prop_msg:
+        error_log('\'%s\' %s' % (apath, ', '.join(prop_msg)))
+        return False
+    return True
 
 
-def processAppConf(papas_conf_data={}, app_conf_data={}):
+def load_json_file(afile):
     '''
-    Parse configuration data
-    Application mandatory keys are: program#, params#, and dependences
+    Load a JSON configuration file.
+    Returns data in a dictionary.
+
+    Positional arguments:
+        apath -- JSON file
+    '''
+    data = {}
+    with open(afile, 'r') as f:
+        data = json.load(f)
+    return data
+
+
+def process_papas_conf(conf_data):
+    '''
+    Parse and validate application configuration data.
     PaPaS mandatory keys are: extensions
+
+    Positional arguments:
+        conf_data -- application configuration data
     '''
+    pass
+
+
+def validate_app_conf(conf_data):
+    '''
+    Validate application configuration data.
+    Returns True or False.
+
+    Positional arguments:
+        conf_data -- application configuration data
+    '''
+    # Check mandatory keys: program, params, and dependences
+    app_keys = ['program', 'params']
+    for k in app_keys:
+        if k not in conf_data:
+            return False
+    return True
+
+
+def process_app_conf(conf_data):
+    '''
+    Parse and process application configuration data.
+
+    Positional arguments:
+        conf_data -- application configuration data
+    '''
+    if not validate_app_conf(conf_data):
+        error_log('invalid application JSON configuration.')
+        return
 
     # Construct command line
     cmd = []
@@ -69,13 +180,22 @@ def processAppConf(papas_conf_data={}, app_conf_data={}):
     # Check for env variables pre-application.
     # Check for extensions to auto-detect C/C++/Python/Java/etc.
     # Append ./ only if single word and it is an executable
-    prog_name = app_conf_data['program1']
-    if os.access(prog_name, os.X_OK):
-        cmd.append('./' + prog_name)
+    prog_name = conf_data['program']
+    if ' ' in prog_name:
+        for i in prog_name.split():
+            cmd.append(i)
     else:
-        cmd.append(prog_name)
+        if validate_path(prog_name, execute=True):
+            prestr = ''
+            '''
+            if '/' == prog_name[0]:
+                prestr = '.'
+            elif './' != prog_name[:2]:
+                prestr = './'
+            '''
+            cmd.append(prestr + prog_name)
 
-    for param, vals in app_conf_data['params1'].items():
+    for param, vals in conf_data['params'].items():
         if isinstance(vals, list) and len(vals) > 1:
             for val in vals:
                 cmd.append(param)
@@ -84,16 +204,22 @@ def processAppConf(papas_conf_data={}, app_conf_data={}):
             cmd.append(param)
             cmd.append(vals)
 
-    print(' '.join(cmd))
+    print(cmd)
+    #print_log(' '.join(cmd))
     subprocess.run(cmd)
 
 
 '''
 Main entry point
 '''
-if __name__ == "__main__":
-    args = parseArgs()
-    papas_conf_data = loadConfData(args.papas_conf_file)
-    app_conf_data = loadConfData(args.app_conf_file)
-    processAppConf(papas_conf_data, app_conf_data)
+if __name__ == '__main__':
+    #from timeit import Timer
+    #t = Timer('args = parse_args(); load_json_file(args.papas_conf_file)', 'from __main__ import parse_args, load_json_file')
+    #print_log(t.timeit(number=100))
+
+    args = parse_args()
+    papas_conf_data = load_json_file(args.papas_conf_file)
+    app_conf_data = load_json_file(args.app_conf_file)
+    process_papas_conf(papas_conf_data)
+    process_app_conf(app_conf_data)
 
