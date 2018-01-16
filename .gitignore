@@ -1,6 +1,5 @@
 NetLogo_6.0
 netlogo_mpi
-*.pyc
 paper/
-build/
+doc/build/
 __pycache__/

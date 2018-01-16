@@ -1,5 +1,6 @@
-PaPaS Main
-==========
+Main
+====
 
 .. automodule:: papas
     :members:
+

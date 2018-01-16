@@ -11,7 +11,7 @@ possible values.
 Example:
 python3 papas.py -c papas_conf.json -a hello.json
 
-todo:
+Todo:
     * Create parser for custom regex expressions
     * Support workflow
 '''
@@ -36,8 +36,8 @@ def print_log(msg='', *, end='\n', file=sys.stdout):
         msg (str): Information to print
 
     Kwoargs:
-        end (char): Character to print at end of message
-        file (obj): file descriptor for output
+        |  end (char): Character to print at end of message
+        |  file (obj): file descriptor for output
     '''
     print(msg, end=end, file=file)
 
@@ -224,7 +224,6 @@ def process_app_conf(conf_data):
             cmd.append(vals)
 
     print(cmd)
-    #print_log(' '.join(cmd))
     subprocess.run(cmd)
 
 
