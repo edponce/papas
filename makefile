@@ -28,4 +28,4 @@ all:
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(DRIVER) -o $(EXE) $(LIBS)
 
 clean:
-	rm -f $(EXE) 
+	rm -f $(EXE)

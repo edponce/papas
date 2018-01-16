@@ -1,5 +1,21 @@
 #!/usr/bin/env python3
 
+'''
+PaPaS: A lightweight and generic framework for parallel parameter studies
+
+This program controls execution of workflows/programs for conducting
+parameter studies in a parallel system.
+A JSON configuration file is used to specify parameters with all their
+possible values.
+
+Example:
+python3 papas.py -c papas_conf.json -a hello.json
+
+todo:
+    * Create parser for custom regex expressions
+    * Support workflow
+'''
+
 import sys
 import os
 import argparse
@@ -9,46 +25,47 @@ import json
 
 
 default_papas_conf_file = 'papas_conf.json'
+'''str: Default PaPaS JSON configuration file.'''
 
 
 def print_log(msg='', *, end='\n', file=sys.stdout):
     '''
     Print messages.
 
-    Keyword arguments:
-        msg -- info to print
+    Kwargs:
+        msg (str): Information to print
 
-    Keyword-only arguments:
-        end -- string to print at end of message
-        file -- file descriptor for output
+    Kwoargs:
+        end (char): Character to print at end of message
+        file (obj): file descriptor for output
     '''
     print(msg, end=end, file=file)
 
 
 def warn_log(msg='', *, end='\n', file=sys.stdout):
     '''
-    Print warning messages.
+    Print messages.
 
-    Keyword arguments:
-        msg -- info to print
+    Kwargs:
+        msg (str): Information to print
 
-    Keyword-only arguments:
-        end -- string to print at end of message
-        file -- file descriptor for output
+    Kwoargs:
+        end (char): Character to print at end of message
+        file (obj): file descriptor for output
     '''
     print('WARN: ' + msg, end=end, file=file)
 
 
 def error_log(msg='', *, end='\n', file=sys.stderr):
     '''
-    Print error messages.
+    Print messages.
 
-    Keyword arguments:
-        msg -- info to print
+    Kwargs:
+        msg (str): Information to print
 
-    Keyword-only arguments:
-        end -- string to print at end of message
-        file -- file descriptor for output
+    Kwoargs:
+        end (char): Character to print at end of message
+        file (obj): file descriptor for output
     '''
     print('ERROR: ' + msg, end=end, file=file)
 
@@ -56,7 +73,9 @@ def error_log(msg='', *, end='\n', file=sys.stderr):
 def parse_args():
     '''
     Parse and validate command line arguments.
-    Returns argparse.Namespace object.
+
+    Returns:
+        object: An argparse.Namespace object
     '''
     parser = argparse.ArgumentParser(prog=__file__,
              description='PaPaS: Framework for parallel parameter studies',
