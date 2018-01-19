@@ -1,8 +1,4 @@
 {
-    "program": "./hello.py",
-    "params":
-    {
-        "--xparam": "10"
-    }
+    "program": "./hello.py"
 }
 

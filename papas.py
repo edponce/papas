@@ -29,7 +29,10 @@ import json
 
 
 default_papas_conf_file = 'papas_conf.json'
-'''str: Default PaPaS JSON configuration file.'''
+'''str: Default PaPaS JSON configuration file'''
+
+args = None
+'''obj: argparse.Namespace object with command line arguments'''
 
 
 def print_log(msg='', *, end='\n', file=sys.stdout):
@@ -77,16 +80,33 @@ def error_log(msg='', *, end='\n', file=sys.stderr):
     print('ERROR: ' + msg, end=end, file=file)
 
 
+def debug_log(msg='', *, end='\n', file=sys.stdout):
+    '''
+    Print debugging messages.
+
+    Args:
+        msg (str, optional): Information to print
+            (default is empty string)
+        end (char, optional): Character to print at end of message
+            (default is newline)
+        file (obj, optional): File descriptor for output
+            (default is sys.stderr)
+    '''
+    if args.conf_debug:
+        print('DEBUG: ' + msg, end=end, file=file)
+
+
 def parse_args():
     '''
     Parse and validate command line arguments.
-
-    Returns:
-        obj: An argparse.Namespace object
     '''
     parser = argparse.ArgumentParser(prog=__file__,
              description='PaPaS: Framework for parallel parameter studies',
              formatter_class=RawTextHelpFormatter)
+
+    parser.add_argument('-d', '--debug', action='store_true', dest='conf_debug',
+                        help='Enable/disable debugging operations\n'
+                             'Default is disabled')
 
     parser.add_argument('-c', '--conf', type=str, dest='papas_conf_file',
                         default=default_papas_conf_file,
@@ -97,6 +117,7 @@ def parse_args():
                         default='',
                         help='Application JSON configuration file')
 
+    global args
     args = parser.parse_args()
 
     # Validate options
@@ -112,12 +133,11 @@ def parse_args():
         parser.print_help()
         sys.exit(os.EX_USAGE)
 
-    return args
-
 
 def validate_file(afile, *, dir=False, read=True, write=False, execute=False):
     '''
     Check access properties of a given file or directory, if it exists.
+    Only checks for properties that are set to True, others are ignored.
 
     Args:
         afile (str): File or directory to check
@@ -131,7 +151,7 @@ def validate_file(afile, *, dir=False, read=True, write=False, execute=False):
             (default is False)
 
     Returns:
-        bool: True if all properties are supported, else False
+        bool: True if all properties set are supported, else False
 
     Todo:
         * Remove print messages, useful for debugging only
@@ -150,7 +170,7 @@ def validate_file(afile, *, dir=False, read=True, write=False, execute=False):
             prop_msg += ['is not executable']
 
     if prop_msg:
-        error_log('\'%s\' %s' % (afile, ', '.join(prop_msg)))
+        debug_log('\'%s\' %s' % (afile, ', '.join(prop_msg)))
         return False
     return True
 
@@ -192,9 +212,9 @@ def validate_app_conf(conf_data):
     Returns:
         bool: True if configurations is valid, else False
     '''
-    # Mandatory keys: program, params
-    # Optional keys: dependences
-    app_keys = ['program', 'params']
+    # Mandatory keys: program
+    # Optional keys: params, dependences
+    app_keys = ['program']
     for k in app_keys:
         if k not in conf_data:
             return False
@@ -246,7 +266,7 @@ def process_app_conf(papas_conf_data, app_conf_data):
     '''
     if len(cmd) == 1:
         if validate_file(cmd[0], execute=True):
-            print('File is executable')
+            debug_log('File is executable')
         else:
             fn, fx = os.path.splitext(cmd[0])
 
@@ -262,18 +282,16 @@ def process_app_conf(papas_conf_data, app_conf_data):
             else:
                 cmd = prog_tmp_str.split() + cmd
 
-            print(cmd)
-            return
-
-    # Parse command line arguments
-    for param, vals in app_conf_data['params'].items():
-        if isinstance(vals, list) and len(vals) > 1:
-            for val in vals:
+    # Parse program parameters
+    if 'params' in app_conf_data:
+        for param, vals in app_conf_data['params'].items():
+            if isinstance(vals, list) and len(vals) > 1:
+                for val in vals:
+                    cmd.append(param)
+                    cmd.append(val)
+            else:
                 cmd.append(param)
-                cmd.append(val)
-        else:
-            cmd.append(param)
-            cmd.append(vals)
+                cmd.append(vals)
 
     print(cmd)
     subprocess.run(cmd)
@@ -284,10 +302,10 @@ Main entry point
 '''
 if __name__ == '__main__':
     #from timeit import Timer
-    #t = Timer('args = parse_args(); load_json_file(args.papas_conf_file)', 'from __main__ import parse_args, load_json_file')
+    #t = Timer('parse_args(); load_json_file(args.papas_conf_file)', 'from __main__ import parse_args, load_json_file')
     #print_log(t.timeit(number=100))
 
-    args = parse_args()
+    parse_args()
     papas_conf_data = load_json_file(args.papas_conf_file)
     app_conf_data = load_json_file(args.app_conf_file)
     validate_papas_conf(papas_conf_data)
