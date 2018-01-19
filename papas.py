@@ -7,6 +7,8 @@ This program controls execution of workflows/programs for conducting
 parameter studies in a parallel system.
 A JSON configuration file is used to specify parameters with all their
 possible values.
+Parameters should be expected either from files, environment variables,
+and/or command line arguments.
 
 Example:
 python3 papas.py -c papas_conf.json -a hello.json
@@ -14,6 +16,8 @@ python3 papas.py -c papas_conf.json -a hello.json
 Todo:
     * Create parser for custom regex expressions
     * Support workflow
+    * Need function to substitute '%' from configuration files
+    * Need function to split strings into list, but maintaining quoted strings
 '''
 
 import sys
@@ -30,42 +34,45 @@ default_papas_conf_file = 'papas_conf.json'
 
 def print_log(msg='', *, end='\n', file=sys.stdout):
     '''
-    Print messages.
+    Print output messages.
 
-    Kwargs:
-        msg (str): Information to print
-
-    Kwoargs:
-        |  end (char): Character to print at end of message
-        |  file (obj): file descriptor for output
+    Args:
+        msg (str, optional): Information to print
+            (default is empty string)
+        end (char, optional): Character to print at end of message
+            (default is newline)
+        file (obj, optional): File descriptor for output
+            (default is sys.stdout)
     '''
     print(msg, end=end, file=file)
 
 
 def warn_log(msg='', *, end='\n', file=sys.stdout):
     '''
-    Print messages.
+    Print warning messages.
 
-    Kwargs:
-        msg (str): Information to print
-
-    Kwoargs:
-        end (char): Character to print at end of message
-        file (obj): file descriptor for output
+    Args:
+        msg (str, optional): Information to print
+            (default is empty string)
+        end (char, optional): Character to print at end of message
+            (default is newline)
+        file (obj, optional): File descriptor for output
+            (default is sys.stdout)
     '''
     print('WARN: ' + msg, end=end, file=file)
 
 
 def error_log(msg='', *, end='\n', file=sys.stderr):
     '''
-    Print messages.
+    Print error messages.
 
-    Kwargs:
-        msg (str): Information to print
-
-    Kwoargs:
-        end (char): Character to print at end of message
-        file (obj): file descriptor for output
+    Args:
+        msg (str, optional): Information to print
+            (default is empty string)
+        end (char, optional): Character to print at end of message
+            (default is newline)
+        file (obj, optional): File descriptor for output
+            (default is sys.stderr)
     '''
     print('ERROR: ' + msg, end=end, file=file)
 
@@ -75,7 +82,7 @@ def parse_args():
     Parse and validate command line arguments.
 
     Returns:
-        object: An argparse.Namespace object
+        obj: An argparse.Namespace object
     '''
     parser = argparse.ArgumentParser(prog=__file__,
              description='PaPaS: Framework for parallel parameter studies',
@@ -94,10 +101,10 @@ def parse_args():
 
     # Validate options
     err = 0
-    if not validate_path(args.papas_conf_file, read=True):
+    if not validate_file(args.papas_conf_file):
         err += 1
 
-    if not validate_path(args.app_conf_file, read=True):
+    if not validate_file(args.app_conf_file):
         err += 1
 
     if err:
@@ -108,35 +115,42 @@ def parse_args():
     return args
 
 
-def validate_path(apath, *, file=True, read=False, write=False, execute=False):
+def validate_file(afile, *, dir=False, read=True, write=False, execute=False):
     '''
     Check access properties of a given file or directory, if it exists.
-    Returns True or False.
 
-    Positional arguments:
-        apath -- file or directory to check
+    Args:
+        afile (str): File or directory to check
+        dir (bool, optional): Specify if it is a file or directory
+            (default is False)
+        read (bool, optional): Check if path is readable
+            (default is True)
+        write (bool, optional): Check if path is writeable
+            (default is False)
+        execute (bool, optional): Check if path is executable
+            (default is False)
 
-    Keyword-only arguments:
-        file -- specify if it is a file or directory (default is True)
-        read -- check if path is readable (default is False)
-        write -- check if path is writeable (default is False)
-        execute -- check if path is executable (default is False)
+    Returns:
+        bool: True if all properties are supported, else False
+
+    Todo:
+        * Remove print messages, useful for debugging only
     '''
     prop_msg = []
-    if file and not os.path.isfile(apath):
+    if not dir and not os.path.isfile(afile):
         prop_msg += ['file does not exists']
-    elif not file and not os.path.isdir(apath):
+    elif dir and not os.path.isdir(afile):
         prop_msg += ['directory does not exists']
     else:
-        if read and not os.access(apath, os.R_OK):
+        if read and not os.access(afile, os.R_OK):
             prop_msg += ['is not readable']
-        if write and not os.access(apath, os.W_OK):
+        if write and not os.access(afile, os.W_OK):
             prop_msg += ['is not writable']
-        if execute and not os.access(apath, os.X_OK):
+        if execute and not os.access(afile, os.X_OK):
             prop_msg += ['is not executable']
 
     if prop_msg:
-        error_log('\'%s\' %s' % (apath, ', '.join(prop_msg)))
+        error_log('\'%s\' %s' % (afile, ', '.join(prop_msg)))
         return False
     return True
 
@@ -144,10 +158,12 @@ def validate_path(apath, *, file=True, read=False, write=False, execute=False):
 def load_json_file(afile):
     '''
     Load a JSON configuration file.
-    Returns data in a dictionary.
 
-    Positional arguments:
-        apath -- JSON file
+    Args:
+        afile (str): JSON file
+
+    Returns:
+        dict: Configuration data
     '''
     data = {}
     with open(afile, 'r') as f:
@@ -155,13 +171,13 @@ def load_json_file(afile):
     return data
 
 
-def process_papas_conf(conf_data):
+def validate_papas_conf(conf_data):
     '''
     Parse and validate application configuration data.
     PaPaS mandatory keys are: extensions
 
-    Positional arguments:
-        conf_data -- application configuration data
+    Args:
+        conf_data (dict): Application configuration data
     '''
     pass
 
@@ -169,12 +185,15 @@ def process_papas_conf(conf_data):
 def validate_app_conf(conf_data):
     '''
     Validate application configuration data.
-    Returns True or False.
 
-    Positional arguments:
-        conf_data -- application configuration data
+    Args:
+        conf_data (dict): Application configuration data
+
+    Returns:
+        bool: True if configurations is valid, else False
     '''
-    # Check mandatory keys: program, params, and dependences
+    # Mandatory keys: program, params
+    # Optional keys: dependences
     app_keys = ['program', 'params']
     for k in app_keys:
         if k not in conf_data:
@@ -182,39 +201,72 @@ def validate_app_conf(conf_data):
     return True
 
 
-def process_app_conf(conf_data):
+def process_app_conf(papas_conf_data, app_conf_data):
     '''
     Parse and process application configuration data.
 
-    Positional arguments:
-        conf_data -- application configuration data
+    Args:
+        papas_conf_data (dict): PaPaS configuration data
+        app_conf_data (dict): Application configuration data
+
+    Todo:
+        * Handle filenames with spaces
+        * Parse command line tokens
     '''
-    if not validate_app_conf(conf_data):
+    if not validate_app_conf(app_conf_data):
         error_log('invalid application JSON configuration.')
         return
 
-    # Construct command line
-    cmd = []
+    # Construct list of given command line
+    '''
+    Todo: Handle filenames with spaces
+        * In JSON conf need to place filename between \'escaped quotes\'.
+        * Before split, check for quotes and extract as a single token.
+          Use [idx for idx, ltr in enumerate(prog_name) if ltr == '\'']
+          to get all indices of quotes.
+    '''
+    prog_name = app_conf_data['program']
+    cmd = prog_name.split()
 
-    # Check for env variables pre-application.
-    # Check for extensions to auto-detect C/C++/Python/Java/etc.
-    # Append ./ only if single word and it is an executable
-    prog_name = conf_data['program']
-    if ' ' in prog_name:
-        for i in prog_name.split():
-            cmd.append(i)
-    else:
-        if validate_path(prog_name, execute=True):
-            prestr = ''
-            '''
-            if '/' == prog_name[0]:
-                prestr = '.'
-            elif './' != prog_name[:2]:
-                prestr = './'
-            '''
-            cmd.append(prestr + prog_name)
+    # Parse command line and identify executable program/file
+    '''Todo: Parse command line tokens
+        1. If single token:
+            - If executable, then assume is an executable program as is.
+              If no extension, assume is a command seen in PATH.
+              If extension:
+                  * If begins with slash append '.'
+                  * If no slash append './'
+            - If not executable, assume is a script identified by extension
+        2. If multiple tokens:
+            - If has environment variables, first token not an env variable
+              apply the single token considerations
+            - If no environment variables, use first token and
+              apply the single token considerations
+        3. In configuration dictionaries, can use '%' as a substitute for key.
+    '''
+    if len(cmd) == 1:
+        if validate_file(cmd[0], execute=True):
+            print('File is executable')
+        else:
+            fn, fx = os.path.splitext(cmd[0])
 
-    for param, vals in conf_data['params'].items():
+            # Check if file extension is valid
+            prog_tmp_str =  papas_conf_data['file_extensions'].get(fx)
+            if not prog_tmp_str:
+                error_log('file not executable, no supported file extension')
+                return
+
+            if prog_tmp_str.find('%') >= 0:
+                prog_str = prog_tmp_str.replace('%', fn)
+                cmd = prog_str.split()
+            else:
+                cmd = prog_tmp_str.split() + cmd
+
+            print(cmd)
+            return
+
+    # Parse command line arguments
+    for param, vals in app_conf_data['params'].items():
         if isinstance(vals, list) and len(vals) > 1:
             for val in vals:
                 cmd.append(param)
@@ -238,6 +290,6 @@ if __name__ == '__main__':
     args = parse_args()
     papas_conf_data = load_json_file(args.papas_conf_file)
     app_conf_data = load_json_file(args.app_conf_file)
-    process_papas_conf(papas_conf_data)
-    process_app_conf(app_conf_data)
+    validate_papas_conf(papas_conf_data)
+    process_app_conf(papas_conf_data, app_conf_data)
 
