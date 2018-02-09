@@ -1,4 +1,4 @@
-#!/usr/bin/env python2
+#!/usr/bin/python2
 
 import sys
 import os
@@ -40,8 +40,11 @@ def parseArgs():
                         default='',
                         help='Directory of setup files')
 
+    #parser.add_argument('-s', '--setupfiles', type=str, dest='setup_files',
+                        #default='', nargs='+', metavar=('S1', 'S2'),
+                        #help='Setup files (without last slash)')
     parser.add_argument('-s', '--setupfiles', type=str, dest='setup_files',
-                        default='', nargs='+', metavar=('S1', 'S2'),
+                        default=[], action='append',
                         help='Setup files (without last slash)')
 
     args = parser.parse_args()
@@ -53,8 +56,9 @@ def parseArgs():
         err += 1
 
     if not os.path.isfile(args.netlogo_prog):
-        print 'ERROR: NetLogo program does not exists, ' + args.netlogo_prog
-        err += 1
+        if not os.path.islink(args.netlogo_prog):
+            print 'ERROR: NetLogo program does not exists, ' + args.netlogo_prog
+            err += 1
 
     if not os.path.isfile(args.model_file):
         print 'ERROR: NetLogo model file does not exists, ' + args.model_file

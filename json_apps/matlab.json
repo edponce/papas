@@ -1,5 +1,4 @@
 {
-    "program": "myscript.m",
-    "params": {}
+    "program": "apps/myscript.m"
 }
 

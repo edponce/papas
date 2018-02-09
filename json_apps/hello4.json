@@ -1,5 +1,5 @@
 {
-    "program": "/home/edponce/Documents/utk/netlogo/mpi_netlogo/hello.py",
+    "program": "/home/edponce/Documents/utk/papas/papas/apps/hello.py",
     "params":
     {
         "--xparam": "10"

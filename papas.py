@@ -5,7 +5,7 @@ PaPaS: A lightweight and generic framework for parallel parameter studies
 
 This program controls execution of workflows/programs for conducting
 parameter studies in a parallel system.
-A JSON configuration file is used to specify parameters with all their
+A YAML or JSON configuration file is used to specify parameters with all their
 possible values.
 Parameters should be expected either from files, environment variables,
 and/or command line arguments.
@@ -26,6 +26,7 @@ import argparse
 from argparse import RawTextHelpFormatter
 import subprocess
 import json
+import yaml
 
 
 default_papas_conf_file = 'papas_conf.json'
@@ -110,12 +111,12 @@ def parse_args():
 
     parser.add_argument('-c', '--conf', type=str, dest='papas_conf_file',
                         default=default_papas_conf_file,
-                        help='PaPaS JSON configuration file\n'
+                        help='PaPaS YAML/JSON configuration file\n'
                              'Default is \'' + default_papas_conf_file + '\'')
 
     parser.add_argument('-a', '--app', type=str, dest='app_conf_file',
                         default='',
-                        help='Application JSON configuration file')
+                        help='Application YAML/JSON configuration file')
 
     global args
     args = parser.parse_args()
@@ -188,6 +189,22 @@ def load_json_file(afile):
     data = {}
     with open(afile, 'r') as f:
         data = json.load(f)
+    return data
+
+
+def load_yaml_file(afile):
+    '''
+    Load a YAML configuration file.
+
+    Args:
+        afile (str): YAML file
+
+    Returns:
+        dict: Configuration data
+    '''
+    data = {}
+    with open(afile, 'r') as f:
+        data = yaml.load(f)
     return data
 
 
@@ -306,8 +323,11 @@ if __name__ == '__main__':
     #print_log(t.timeit(number=100))
 
     parse_args()
-    papas_conf_data = load_json_file(args.papas_conf_file)
-    app_conf_data = load_json_file(args.app_conf_file)
+    #papas_conf_data = load_json_file(args.papas_conf_file)
+    #app_conf_data = load_json_file(args.app_conf_file)
+    papas_conf_data = load_yaml_file(args.papas_conf_file)
+    app_conf_data = load_yaml_file(args.app_conf_file)
+
     validate_papas_conf(papas_conf_data)
     process_app_conf(papas_conf_data, app_conf_data)
 

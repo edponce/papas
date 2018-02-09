@@ -7,7 +7,7 @@
         ".jar": "java -jar",
         ".py": "python",
         ".py3": "python3",
-        ".m": "matlab -nodisplay -nojvm -r %;exit(0);",
+        ".m": "matlab -nodisplay -nojvm -r run('%');exit(0);",
         ".r": "Rscript",
         ".rb": "ruby",
         ".sh": "sh",

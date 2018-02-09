@@ -1,30 +1,14 @@
 {
-    "program1" : "netlogo_mpi.py",
-    "params1" :
+    "program" : "mpiexec -n 2 ./apps/netlogo_mpi.py",
+    "params" :
     {
-        "-p" : "2g",
-        "-n" : "NetLogo_6.0",
-        "-e" : "PaPaS Test",
-        "-m" : "examples/Fire/Fire.nlogo",
-        "-o" : "erase_me.csv",
-        "-d" : "examples/Fire",
-        "-s" : ["Fire1.xml", "Fire2.xml"]
-    },
-
-    "program2" : "",
-
-    "program3" : "",
-    "params3" :
-    {
-        "-i" : "",
-        "-o" : ""
-    },
-
-
-    "dependences" :
-    {
-        "program1" : "program2",
-        "program3" : "program1"
+        "--maxheap" : "2g",
+        "--netlogo" : "/home/edponce/Documents/utk/papas/mpi_netlogo/NetLogo_6.0",
+        "--experiment" : "PaPaS Test",
+        "--modelfile" : "examples/Fire/Fire.nlogo",
+        "--outfile" : "erase_me.csv",
+        "--setupdirectory" : "examples/Fire",
+        "--setupfiles" : ["Fire1.xml","Fire2.xml"]
     }
 }
 
