@@ -29,7 +29,8 @@ import json
 import yaml
 
 
-default_papas_conf_file = 'papas_conf.json'
+#default_papas_conf_file = 'papas_conf.json'
+default_papas_conf_file = 'papas_conf.yaml'
 '''str: Default PaPaS JSON configuration file'''
 
 args = None

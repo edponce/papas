@@ -7,6 +7,7 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('.'))
 sys.path.append(os.path.abspath('..'))
+sys.path.append(os.path.abspath('../PaPaS'))
 
 
 # -- General configuration ------------------------------------------------
@@ -42,14 +43,14 @@ author = u'Eduardo Ponce'
 copyright = u'2018, ' + author
 
 title = u'PaPaS Documentation'
-description = u'A generic framework for parallel parameter studies'
+description = u'A lightweight and generic framework for parallel parameter studies'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
 # built documents.
 #
 # The short X.Y version.
-version = u'0.5'
+version = u'1.0'
 # The full version, including alpha/beta/rc tags.
 release = version
 
