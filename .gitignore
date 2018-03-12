@@ -1,5 +1,6 @@
-doc/build/
 */__pycache__/
 *.py[co]
 .tox/
 *.egg*/
+*build/
+*dist/

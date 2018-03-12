@@ -6,6 +6,8 @@ from setuptools import setup, find_packages
 
 topdir = os.path.dirname(__file__)
 moduledir = os.path.join(topdir, 'PaPaS')
+testsdir = os.path.join(topdir, 'tests')
+docdir = os.path.join(topdir, 'doc')
 
 # Get values for package setup info from __init__.py
 pkg = {}
@@ -37,7 +39,7 @@ setup(
     keywords=pkg['__keywords__'],
     platforms='linux',
     license=pkg['__license__'],
-    packages=find_packages(exclude=['doc', 'tests']),
+    packages=find_packages(exclude=[docdir, testsdir]),
     include_package_data=True,
     zip_safe=False,
     classifiers=[
@@ -52,6 +54,6 @@ setup(
     python_requires='>=3',
     install_requires=requirements,
     setup_requires=setup_requirements,
-    test_suite='tests',
+    test_suite=testsdir,
     tests_require=test_requirements,
 )

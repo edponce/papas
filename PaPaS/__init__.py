@@ -1,5 +1,5 @@
 '''
-Main PaPaS package
+PaPaS module
 '''
 __title__ = 'PaPaS'
 __description__ = 'A generic framework for parallel parameter studies'
