@@ -1,5 +1,5 @@
 '''
-Main PaPaS package
+Unit test package for PaPaS
 '''
 __author__ = 'Eduardo Ponce'
 __email__ = 'eponcemo@utk.edu'

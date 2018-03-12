@@ -1,13 +1,15 @@
+===================
 PaPaS Documentation
 ===================
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Contents:
+    :maxdepth: 2
 
-   main
+    modules
+    main
 
 
+==================
 Indices and tables
 ==================
 
