@@ -16,7 +16,7 @@ sys.path.append(testsdir)
 
 # Get values for package setup info from __init__.py
 pkg = {}
-exec(open(os.path.join(moduledir, '__init__.py')).read(),pkg)
+exec(open(os.path.join(moduledir, '__init__.py')).read(), pkg)
 
 # -- General configuration ------------------------------------------------
 

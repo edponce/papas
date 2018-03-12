@@ -9,7 +9,7 @@ moduledir = os.path.join(topdir, 'PaPaS')
 
 # Get values for package setup info from __init__.py
 pkg = {}
-exec(open(os.path.join(moduledir, '__init__.py')).read(),pkg)
+exec(open(os.path.join(moduledir, '__init__.py')).read(), pkg)
 
 # Load long description from file
 readme = open(os.path.join(topdir, 'README.rst')).read()
