@@ -3,13 +3,18 @@
 import unittest
 
 
-def main():
-    print('Tests are under construction.')
-    unittest.main()
+class TestStringMethods(unittest.TestCase):
+
+    def test_upper(self):
+        self.assertEqual('foo'.upper(), 'FOO')
+
+    def test_isupper(self):
+        self.assertTrue('FOO'.isupper())
+        self.assertFalse('Foo'.isupper())
 
 
 '''
 Main entry point
 '''
 if __name__ == '__main__':
-    main()
+    unittest.main()

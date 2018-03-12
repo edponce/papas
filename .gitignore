@@ -2,4 +2,4 @@ doc/build/
 */__pycache__/
 *.py[co]
 .tox/
-*egg-info*/
+*.egg*/
