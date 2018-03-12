@@ -1,4 +1,7 @@
-# MPI NetLogo 6.0
+.. highlight:: shell
+
+MPI NetLogo 6.0
+===============
 
 This project provides a workflow composed of a set of scripts and a MPI
 dispatcher program that allows to run parallel jobs of NetLogo in a managed
@@ -13,19 +16,20 @@ processes/nodes. Each process runs a subset of parameters/timesteps.
 Partial output files are merged and reordered into a single CSV file for
 further data analysis.
 
-The workflow is as follows:
-    1. User sets up model and parameters in NetLogo GUI (offline)
-    1. Model file and cluster submission script are uploaded to the cluster
-    1. User logs to cluster and submits job
-    1. When job completes, user downloads output files
 
-* This work is currently under development for the ACF cluster at UTK.
+================
+NetLogo Workflow
+================
+1. User sets up model and parameters in NetLogo GUI (offline)
+2. Model file and cluster submission script are uploaded to the cluster
+3. User logs to cluster and submits job
+4. When job completes, user downloads output files
 
-**NOTE:** For test cases, create a symbolic link of the local NetLogo 6.0
-top directory inside `mpi_netlogo` project:
+This work is currently under development for the ACF cluster at UTK.
 
-```bash
-cd mpi_netlogo
-ln -s /full/path/to/local/NetLogo NetLogo_6.0
-```
+NOTE: For test cases, create a symbolic link of the local NetLogo 6.0
+top directory inside `mpi_netlogo` project::
+
+    $ cd mpi_netlogo
+    $ ln -s /full/path/to/local/NetLogo NetLogo_6.0
 
