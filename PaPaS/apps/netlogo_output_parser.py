@@ -6,14 +6,16 @@ import argparse
 from argparse import RawTextHelpFormatter
 
 
-# NOTE: The following are requirements/assumptions to enable correct processing
+# NOTE: The following are requirements to enable correct processing
 #       * There is a data column named '[run number]'
 #       * There is a data column named '[step]'
-#       * The parameters varied are between '[run number]' and '[step]' columns
-#       * Data records follow directly after column titles and there is no empty record between data
+#       * Parameters varied are between '[run number]' and '[step]' columns
+#       * Data records follow directly after column titles
+#       * There is no empty record between data records and column titles
 #       * All data values are numeric (integers or decimals)
-#       * All data sections have the same number of columns (and in same order)
-#       * Each data section has at least 2 header lines, one with less columns than data columns
+#       * All data sections have the same number of columns and in same order
+#       * Each data section has at least 2 header lines, one with less columns
+#         than data columns
 
 
 # Global variables
@@ -25,17 +27,30 @@ def parseArgs():
     '''
     Parse command line arguments
     '''
-    parser = argparse.ArgumentParser(prog=__file__, description='NetLogo Output Parser:\n'
-             'Parse and order data from a combined/unordered NetLogo output .csv file',
-             formatter_class=RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(
+        prog=__file__,
+        description='NetLogo Output Parser:\n'
+                    'Parse and order data from a combined/unordered '
+                    'NetLogo output .csv file',
+        formatter_class=RawTextHelpFormatter
+    )
 
-    parser.add_argument('-i', '--infile', type=str, dest='infile',
-                        default='',
-                        help='NetLogo .csv file with combined/unordered data')
-    parser.add_argument('-o', '--outfile', type=str, dest='outfile',
-                        default='netlogo_ordered.csv',
-                        help='NetLogo .csv file with ordered data\n'
-                             '(default is netlogo_ordered.csv)')
+    parser.add_argument(
+        '-i', '--infile',
+        type=str,
+        dest='infile',
+        default='',
+        help='NetLogo .csv file with combined/unordered data'
+    )
+
+    parser.add_argument(
+        '-o', '--outfile',
+        type=str,
+        dest='outfile',
+        default='netlogo_ordered.csv',
+        help='NetLogo .csv file with ordered data\n'
+             'Default is \'netlogo_ordered.csv\''
+    )
 
     args = parser.parse_args()
 
@@ -76,7 +91,6 @@ def processNetLogoCSV(infile='', outfile=''):
     header_or_data_flag = 0  # toggle flag: 0 = header, 1 = data
 
     run_number_col = 0  # identify column with 'run number' value
-    run_number_count = 0  # global counter for combining all 'run numbers'
     run_number_lmax = 0  # local maximum 'run number', per data section
     run_number_gmax = 0  # global maximum 'run number'
 
@@ -94,7 +108,8 @@ def processNetLogoCSV(infile='', outfile=''):
             if not first_header_flag:
                 header_data.append(tuple(line_split))  # save header
 
-                # Assume .csv always have a column named 'run number' before the data records
+                # Assume .csv always have a column named 'run number'
+                # before the data records
                 if run_number_colstr in line:
                     first_header_flag = True
                     header_or_data_flag = 1
@@ -108,13 +123,16 @@ def processNetLogoCSV(infile='', outfile=''):
                             step_col = i
 
             else:
-                # If number of columns do not match, assume it is the start of another header
+                # If number of columns do not match, assume it is the start
+                # of another header
                 if ncols != num_data_cols:
                     header_or_data_flag = 0
 
-                # Assume .csv always have a column named 'run number' before the data records
+                # Assume .csv always have a column named 'run number'
+                # before the data records
                 elif run_number_colstr in line:
-                    run_number_gmax = run_number_gmax + run_number_lmax  # increment global maximum 'run number'
+                    # increment global maximum 'run number'
+                    run_number_gmax = run_number_gmax + run_number_lmax
                     run_number_lmax = 0  # reset local maximum 'run number'
                     header_or_data_flag = 1
 
@@ -125,11 +143,16 @@ def processNetLogoCSV(infile='', outfile=''):
                     if run_number > run_number_lmax:
                         run_number_lmax = run_number
 
-                    line_split[run_number_col] = str(run_number + run_number_gmax)
+                    line_split[run_number_col] = str(
+                        run_number + run_number_gmax
+                    )
                     raw_data.append(tuple([float(l) for l in line_split]))
 
-    # Sort data based on parameters between 'run number' and 'step', including 'step'
-    sort_data = sorted(raw_data, key=lambda x: (x[run_number_col + 1:step_col + 1]))
+    # Sort data based on parameters between 'run number' and 'step',
+    # including 'step'
+    sort_data = sorted(
+        raw_data, key=lambda x: (x[run_number_col + 1:step_col + 1])
+    )
 
     # Pretty print file stats
     print('  Header lines: ' + str(len(header_data)))
@@ -144,9 +167,9 @@ def processNetLogoCSV(infile='', outfile=''):
 
         # Write data
         for line in sort_data:
-            for i,x in enumerate(line):
+            for i, x in enumerate(line):
                 if i < (num_data_cols - 1):
-                    f.write('%g,' % x),
+                    f.write('%g,' % x)
                 else:
                     f.write('%g\n' % x)
 
@@ -157,4 +180,3 @@ Main entry point
 if __name__ == "__main__":
     args = parseArgs()
     processNetLogoCSV(args.infile, args.outfile)
-

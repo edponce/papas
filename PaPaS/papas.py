@@ -29,7 +29,7 @@ import json
 import yaml
 
 
-#default_papas_conf_file = 'papas_conf.json'
+# default_papas_conf_file = 'papas_conf.json'
 default_papas_conf_file = 'papas_conf.yaml'
 '''str: Default PaPaS JSON configuration file'''
 
@@ -102,22 +102,36 @@ def parse_args():
     '''
     Parse and validate command line arguments.
     '''
-    parser = argparse.ArgumentParser(prog=__file__,
-             description='PaPaS: Framework for parallel parameter studies',
-             formatter_class=RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(
+        prog=__file__,
+        description='PaPaS: Framework for parallel parameter studies',
+        formatter_class=RawTextHelpFormatter
+    )
 
-    parser.add_argument('-d', '--debug', action='store_true', dest='conf_debug',
-                        help='Enable/disable debugging operations\n'
-                             'Default is disabled')
+    parser.add_argument(
+        '-d', '--debug',
+        action='store_true',
+        dest='conf_debug',
+        help='Enable/disable debugging operations\n'
+             'Default is disabled'
+    )
 
-    parser.add_argument('-c', '--conf', type=str, dest='papas_conf_file',
-                        default=default_papas_conf_file,
-                        help='PaPaS YAML/JSON configuration file\n'
-                             'Default is \'' + default_papas_conf_file + '\'')
+    parser.add_argument(
+        '-c', '--conf',
+        type=str,
+        dest='papas_conf_file',
+        default=default_papas_conf_file,
+        help='PaPaS YAML/JSON configuration file\n'
+             'Default is \'' + default_papas_conf_file + '\''
+    )
 
-    parser.add_argument('-a', '--app', type=str, dest='app_conf_file',
-                        default='',
-                        help='Application YAML/JSON configuration file')
+    parser.add_argument(
+        '-a', '--app',
+        type=str,
+        dest='app_conf_file',
+        default='',
+        help='Application YAML/JSON configuration file'
+    )
 
     global args
     args = parser.parse_args()
@@ -289,7 +303,7 @@ def process_app_conf(papas_conf_data, app_conf_data):
             fn, fx = os.path.splitext(cmd[0])
 
             # Check if file extension is valid
-            prog_tmp_str =  papas_conf_data['file_extensions'].get(fx)
+            prog_tmp_str = papas_conf_data['file_extensions'].get(fx)
             if not prog_tmp_str:
                 error_log('file not executable, no supported file extension')
                 return
@@ -319,16 +333,18 @@ def process_app_conf(papas_conf_data, app_conf_data):
 Main entry point
 '''
 if __name__ == '__main__':
-    #from timeit import Timer
-    #t = Timer('parse_args(); load_json_file(args.papas_conf_file)', 'from __main__ import parse_args, load_json_file')
-    #print_log(t.timeit(number=100))
+    # from timeit import Timer
+    # t = Timer(
+    #    'parse_args(); load_json_file(args.papas_conf_file)',
+    #    'from __main__ import parse_args, load_json_file'
+    # )
+    # print_log(t.timeit(number=100))
 
     parse_args()
-    #papas_conf_data = load_json_file(args.papas_conf_file)
-    #app_conf_data = load_json_file(args.app_conf_file)
+    # papas_conf_data = load_json_file(args.papas_conf_file)
+    # app_conf_data = load_json_file(args.app_conf_file)
     papas_conf_data = load_yaml_file(args.papas_conf_file)
     app_conf_data = load_yaml_file(args.app_conf_file)
 
     validate_papas_conf(papas_conf_data)
     process_app_conf(papas_conf_data, app_conf_data)
-

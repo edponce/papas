@@ -3,4 +3,3 @@
 .. include:: ../CONTRIBUTING.rst
 .. include:: ../HISTORY.rst
 .. include:: ../LICENSE
-

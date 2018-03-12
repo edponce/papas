@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import unittest
 
 
@@ -11,4 +13,3 @@ Main entry point
 '''
 if __name__ == '__main__':
     main()
-

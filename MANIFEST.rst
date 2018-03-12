@@ -9,4 +9,3 @@ recursive-include doc *.rst conf.py
 
 recursive-exclude * __pycache__
 recursive-exclude * *.py[cod]
-

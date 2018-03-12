@@ -22,19 +22,20 @@ test_requirements = [
 ]
 
 setup(
-    name = 'PaPaS',
-    version = '1.0.0',
-    author = 'Eduardo Ponce',
-    author_email = 'eponcemo@utk.edu',
-    description = 'A lightweight and generic framework for parallel parameter studies.',
-    long_description = loadfile('README.rst') + '\n\n' + loadfile('HISTORY.rst'),
-    url = 'https://github.com/edponce/papas',
-    license = 'MIT License',
-    keywords = 'PaPaS',
-    packages = find_packages(),
+    name='PaPaS',
+    version='1.0.0',
+    author='Eduardo Ponce',
+    author_email='eponcemo@utk.edu',
+    description='A generic framework for parallel parameter studies.',
+    long_description=loadfile('README.rst'),
+    url='https://github.com/edponce/papas',
+    license='MIT License',
+    keywords='PaPaS',
+    packages=find_packages(),
     include_package_data=True,
     zip_safe=False,
-    classifiers = [
+    platform='linux',
+    classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Topic : Utilities',
         'License :: OSI Approved :: MIT',

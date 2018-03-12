@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 
 import sys
 import os
@@ -10,12 +10,19 @@ def parseArgs():
     '''
     Parse command line arguments
     '''
-    parser = argparse.ArgumentParser(prog=__file__, description='Test',
-             formatter_class=RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(
+        prog=__file__,
+        description='Test',
+        formatter_class=RawTextHelpFormatter
+    )
 
-    parser.add_argument('-x', '--xparam', type=int, dest='x',
-                        default=0,
-                        help='An input parameter')
+    parser.add_argument(
+        '-x', '--xparam',
+        type=int,
+        dest='x',
+        default=0,
+        help='An input parameter'
+    )
 
     args = parser.parse_args()
 
@@ -39,4 +46,3 @@ if __name__ == "__main__":
         print('Hello, world')
     else:
         print('Goodbye, world')
-

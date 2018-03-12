@@ -39,4 +39,3 @@ top directory inside `mpi_netlogo` project ::
 
     $ cd mpi_netlogo
     $ ln -s /full/path/to/local/NetLogo NetLogo_6.0
-

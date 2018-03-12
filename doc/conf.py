@@ -24,12 +24,12 @@ extensions = [
     'sphinx.ext.viewcode',
     'sphinx.ext.autodoc',
     'sphinx.ext.autosectionlabel',
-    #'sphinx.ext.inheritance_diagram',
+    # 'sphinx.ext.inheritance_diagram',
     'sphinx.ext.napoleon',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
-#templates_path = ['_templates']
+# templates_path = ['_templates']
 
 # The suffix(es) of source filenames.
 # You can specify multiple suffix as a list of string:
@@ -79,19 +79,19 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-#html_theme = 'basic'        # unstyled layout
-#html_theme = 'traditional'  # old Python documentation
-#html_theme = 'classic'      # Python2-like documentation
+# html_theme = 'basic'        # unstyled layout
+# html_theme = 'traditional'  # old Python documentation
+# html_theme = 'classic'      # Python2-like documentation
 html_theme = 'sphinxdoc'    # Sphinx documentation
-#html_theme = 'alabaster'    # modified "Kr" Sphinx theme
-#html_theme = 'nature'       # greenish theme
-#html_theme = 'pyramid'      # Pyramid web framework theme
-#html_theme = 'bizstyle'     # simple bluish theme
+# html_theme = 'alabaster'    # modified "Kr" Sphinx theme
+# html_theme = 'nature'       # greenish theme
+# html_theme = 'pyramid'      # Pyramid web framework theme
+# html_theme = 'bizstyle'     # simple bluish theme
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-if html_theme in ('basic','traditional', 'sphinxdoc', 'nature', 'pyramid'):
+if html_theme in ('basic', 'traditional', 'sphinxdoc', 'nature', 'pyramid'):
     html_theme_options = {
         'nosidebar': 'false',
         'sidebarwidth': '200',  # in pixels
@@ -115,7 +115,7 @@ else:
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-#html_static_path = ['_static']
+# html_static_path = ['_static']
 
 # Custom sidebar templates, must be a dictionary that maps document names
 # to template names.
@@ -141,10 +141,10 @@ latex_elements = {
     'extraclassoptions': 'openany, oneside',
 
     # The paper size ('letterpaper' or 'a4paper').
-    #'papersize': 'letterpaper',
+    # 'papersize': 'letterpaper',
 
     # The font size ('10pt', '11pt' or '12pt').
-    #'pointsize': '10pt',
+    # 'pointsize': '10pt',
 
     # Additional stuff for the LaTeX preamble.
     # 'preamble': '',
@@ -178,4 +178,3 @@ man_pages = [
 texinfo_documents = [
     (master_doc, project, title, author, project, description, 'Miscellaneous')
 ]
-

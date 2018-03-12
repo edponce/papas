@@ -16,4 +16,3 @@ Test PaPaS
 .. automodule:: test_papas
     :members:
     :undoc-members:
-
