@@ -25,15 +25,14 @@ with open(os.path.join(topdir, 'REQUIREMENTS'), 'r') as fd:
 # A list of strings specifying what other distributions need to be present
 # in order for this setup script to run.
 setup_requirements = [
-    'setuptools>=38.5',
-    'pip>=9.0',
-    'wheel>=0.30',
+    'setuptools',
+    'pip',
+    'wheel',
 ]
 
 # A list of strings specifying what other distributions need to be present
 # for this package tests to run.
 tests_requirements = [
-    'tox>=2.9',
 ]
 
 # A dictionary mapping of names of "extra" features to lists of strings
