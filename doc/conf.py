@@ -6,17 +6,19 @@
 import os
 import sys
 
+# Specify main paths for package: top, src, tests
 topdir = os.path.abspath('..')
-moduledir = os.path.join(topdir, 'PaPaS')
+moduledir = os.path.join(topdir, 'src')
 testsdir = os.path.join(topdir, 'tests')
 
 sys.path.append(topdir)
 sys.path.append(moduledir)
 sys.path.append(testsdir)
 
-# Get values for package setup info from __init__.py
+# Get values for package setup info from __init__.py of module
 pkg = {}
-exec(open(os.path.join(moduledir, '__init__.py')).read(), pkg)
+with open(os.path.join(moduledir, '__init__.py'), 'r') as fd:
+    exec(fd.read(), pkg)
 
 # -- General configuration ------------------------------------------------
 
@@ -50,7 +52,7 @@ project = pkg['__title__']
 author = pkg['__author__']
 copyright = pkg['__copyright__']
 
-title = pkg['__title__'] + ' Documentation'
+title = '%s Documentation' % pkg['__title__']
 description = pkg['__description__']
 
 # The version info for the project you're documenting, acts as replacement for

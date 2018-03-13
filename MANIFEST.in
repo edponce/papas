@@ -1,12 +1,5 @@
-include AUTHORS.rst
-include README.rst
-include CONTRIBUTING.rst
-include HISTORY.rst
+include *.rst
 include LICENSE
-
-recursive-include tests *
+include REQUIREMENTS
+recursive-include src *.yaml *.json
 recursive-include doc *.rst conf.py
-
-recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
-recursive-exclude * .tox
