@@ -10,7 +10,7 @@ all:
 	@echo "Under construction"
 
 clean:
-	@rm -rf .tox .pytest_cache
+	@rm -rf .tox .pytest_cache htmlcov .coverage
 	@rm -rf build dist .eggs $(PKGNAME).egg-info
 	@rm -rf $(PKGDIR)/__pycache__
 	@rm -rf $(TESTSDIR)/__pycache__

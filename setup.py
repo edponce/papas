@@ -37,8 +37,8 @@ setup_requirements = [
 # for this package tests to run.
 tests_requirements = [
     'tox>=2.9',
+    'flake8>=3.5',
     'coverage>=4.5.1',
-    'codecov>=2.0.15',
 ]
 
 # A dictionary mapping of names of "extra" features to lists of strings
