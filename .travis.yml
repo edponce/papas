@@ -7,9 +7,12 @@ branches:
         - master
 
 matrix:
-    - TOXENV: py34
-    - TOXENV: py35
-    - TOXENV: flake8
+    include:
+        - python: 3.4
+          env: TOXENV=py34
+        - python: 3.5
+          env: TOXENV=py35
+        - TOXENV: flake8
 
 install:
     - python3 -m pip install tox
