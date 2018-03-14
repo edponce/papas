@@ -1,0 +1,20 @@
+language: python
+
+branches:
+    only:
+        - master
+
+matrix:
+    include:
+        - python: 3.0
+          env: TOXENV=py3
+        - python: 3.4
+          env: TOXENV=py34
+        - python: 3.5
+          env: TOXENV=py35
+
+install:
+    - ./.travis/install
+
+script:
+    - ./.travis/run tox

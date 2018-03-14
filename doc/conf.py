@@ -6,19 +6,21 @@
 import os
 import sys
 
-# Specify main paths for package: top, src, tests
-topdir = os.path.abspath('..')
-moduledir = os.path.join(topdir, 'src')
+
+# Specify paths for package modules
+topdir = '..'
+pkgdir = os.path.join(topdir, 'src')
 testsdir = os.path.join(topdir, 'tests')
 
 sys.path.append(topdir)
-sys.path.append(moduledir)
+sys.path.append(pkgdir)
 sys.path.append(testsdir)
 
-# Get values for package setup info from __init__.py of module
+# Load package info from __init__.py
 pkg = {}
-with open(os.path.join(moduledir, '__init__.py'), 'r') as fd:
-    exec(fd.read(), pkg)
+with open(os.path.join(pkgdir, '__init__.py'), 'r') as init:
+    exec(init.read(), pkg)
+
 
 # -- General configuration ------------------------------------------------
 

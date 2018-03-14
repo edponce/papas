@@ -1,26 +1,20 @@
 #!/usr/bin/env python3
 
+import os
 import unittest
 import papas
 
 
-class TestStringMethods(unittest.TestCase):
+# Specify paths for package modules
+pkgdir = 'src'
 
-    def test_upper(self):
-        self.assertEqual('foo'.upper(), 'FOO')
 
-    def test_isupper(self):
-        self.assertTrue('FOO'.isupper())
-        self.assertFalse('Foo'.isupper())
+class TestConfigurationFiles(unittest.TestCase):
 
     def test_appConfFile(self):
-        with open('src/yaml_apps/hello.yaml') as fd:
-            contents = fd.read()
-        self.assertTrue(papas.validate_app_conf(contents))
+        with open(os.path.join(pkgdir, 'yaml_apps/hello.yml'), 'r') as conf:
+            self.assertTrue(papas.validate_app_conf(conf.read()))
 
 
-'''
-Main entry point
-'''
 if __name__ == '__main__':
     unittest.main()

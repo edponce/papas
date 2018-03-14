@@ -1,5 +1,9 @@
 include *.rst
 include LICENSE
-include REQUIREMENTS
-recursive-include src *.yaml *.json
+include src/*.yml
+include src/*.json
+recursive-include src/apps *
+recursive-include src/json_apps *
+recursive-include src/yaml_apps *
+recursive-include src/examples *
 recursive-include doc *.rst conf.py
