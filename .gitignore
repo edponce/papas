@@ -1,6 +1,10 @@
-*/__pycache__/
 *.py[co]
 .tox/
-*.egg*/
+.pytest_cache/
+.coverage
+*.eggs/
+*egg-info/
+*/__pycache__/
 *build/
 *dist/
+htmlcov/
