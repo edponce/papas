@@ -12,9 +12,9 @@ matrix:
     - TOXENV: flake8
 
 install:
-    - pip install tox
+    - python3 -m pip install tox
 
 build: false
 
-test_script:
+script:
     - tox
