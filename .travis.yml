@@ -1,4 +1,4 @@
-sudo: True
+sudo: false
 
 language: python
 
@@ -7,18 +7,14 @@ branches:
         - master
 
 matrix:
-    include:
-        - python: 3
-          env: TOXENV=py3
-        - python: 3.4
-          env: TOXENV=py34
-        - python: 3.5
-          env: TOXENV=py35
-        - python: 3.5
-          env: TOXENV=flake8
+    - TOXENV: py34
+    - TOXENV: py35
+    - TOXENV: flake8
 
 install:
-    - python3 -m pip install tox
+    - pip install tox
 
-script:
-    - tox --skip-missing-interpreters
+build: false
+
+test_script:
+    - tox
