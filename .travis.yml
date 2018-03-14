@@ -1,3 +1,5 @@
+sudo: True
+
 language: python
 
 branches:
@@ -12,9 +14,8 @@ matrix:
           env: TOXENV=py34
         - python: 3.5
           env: TOXENV=py35
-
-install:
-    - ./.travis/install
+        - python: 3.5
+          env: TOXENV=flake8
 
 script:
-    - ./.travis/run tox
+    - tox
