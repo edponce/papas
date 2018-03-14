@@ -16,7 +16,7 @@ matrix:
           env: TOXENV=codecover
 
 install:
-    - apt install libopenmpi-dev openmpi-bin
+    - sudo apt install libopenmpi-dev openmpi-bin
     - pip install tox flake8 coverage
 
 script:
