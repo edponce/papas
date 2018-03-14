@@ -1,23 +1,17 @@
 sudo: false
 
-language: python
-
 branches:
     only:
         - master
 
-matrix:
-    include:
-        - python: 3.5
-          env: TOXENV=py35
-        - python: 3.5
-          env: TOXENV=flake8
-        - python: 3.5
-          env: TOXENV=codecover
+language: python
+
+python:
+    - '3.5'
 
 install:
     - sudo apt install libopenmpi-dev openmpi-bin
-    - pip install tox flake8 coverage
+    - pip install tox-travis flake8 coverage
 
 script:
     - tox

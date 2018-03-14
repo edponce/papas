@@ -1,17 +1,8 @@
 #!/usr/bin/env python3
 
-import os
 from setuptools import setup, find_packages
+import papas
 
-
-# Specify paths for package modules
-pkgdir = 'src'
-testsdir = 'tests'
-
-# Load package info from __init__.py
-pkg = {}
-with open(os.path.join(pkgdir, '__init__.py'), 'r') as init:
-    exec(init.read(), pkg)
 
 # Load long description from files
 with open('README.rst', 'r') as readme, open('CHANGELOG.rst', 'r') as history:
@@ -37,6 +28,7 @@ setup_requirements = [
 # for this package tests to run.
 tests_requirements = [
     'tox>=2.9',
+    'tox-travis>=0.10',
     'flake8>=3.5',
     'coverage>=4.5.1',
 ]
@@ -49,16 +41,16 @@ extras_requirements = {
 }
 
 setup(
-    name=pkg['__title__'],
-    version=pkg['__version__'],
-    description=pkg['__description__'],
+    name=papas.__title__,
+    version=papas.__version__,
+    description=papas.__description__,
     long_description=long_description,
-    keywords=pkg['__keywords__'],
-    url=pkg['__url__'],
-    download_url=pkg['__url__'],
-    author=pkg['__author__'],
-    author_email=pkg['__author_email__'],
-    license=pkg['__license__'],
+    keywords=papas.__keywords__,
+    url=papas.__url__,
+    download_url=papas.__url__,
+    author=papas.__author__,
+    author_email=papas.__author_email__,
+    license=papas.__license__,
     classifiers=[
         'Development Status :: 5 - Production/Stable',
         'Environment :: Console',
@@ -76,11 +68,12 @@ setup(
     platforms=['Linux'],
     zip_safe=False,
     python_requires='>=3',
-    packages=find_packages(exclude=[testsdir]),
     include_package_data=True,
+    packages=find_packages(exclude=['tests']),
+    package_data={},
     install_requires=install_requirements,
     setup_requires=setup_requirements,
     extras_require=extras_requirements,
     tests_require=tests_requirements,
-    test_suite=testsdir,
+    test_suite='tests',
 )

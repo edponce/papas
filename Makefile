@@ -1,16 +1,16 @@
 PKGNAME = PaPaS
-PKGDIR = src
+PKGDIR =  papas
 TESTSDIR = tests
-DOCDIR = doc
+DOCDIR = docs
 
 
-.PHONY:  all clean clean_all docs wheel
+.PHONY:  all clean clean_all wheel
 
 all:
 	@echo "Under construction"
 
 clean:
-	@rm -rf .tox .pytest_cache htmlcov .coverage
+	@rm -rf .tox .pytest_cache htmlcov .coverage*
 	@rm -rf build dist .eggs $(PKGNAME).egg-info
 	@rm -rf $(PKGDIR)/__pycache__
 	@rm -rf $(TESTSDIR)/__pycache__

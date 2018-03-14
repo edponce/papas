@@ -1,9 +1,9 @@
 include *.rst
 include LICENSE
-include src/*.yml
-include src/*.json
-recursive-include src/apps *
-recursive-include src/json_apps *
-recursive-include src/yaml_apps *
-recursive-include src/examples *
-recursive-include doc *.rst conf.py
+include papas/*.yml
+include papas/*.json
+recursive-include papas/apps *
+recursive-include papas/json_apps *
+recursive-include papas/yaml_apps *
+recursive-include papas/examples *
+recursive-include docs *.rst conf.py Makefile
