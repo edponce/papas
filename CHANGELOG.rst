@@ -1,4 +1,4 @@
-0.4 (03-14-2018)
+0.4 (2018-03-14)
 ================
 
 * None
@@ -6,7 +6,7 @@
 Features
 --------
 
-* None
+* Added code coverage support for test suite
 
 Bug fixes
 ---------
@@ -14,7 +14,7 @@ Bug fixes
 * None
 
 
-0.2 (03-08-2018)
+0.2 (2018-03-08)
 ================
 
 * Initial implementation with simple JSON/YAML configurations
