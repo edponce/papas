@@ -1,5 +1,8 @@
 .. highlight:: shell
 
+.. image:: https://travis-ci.org/edponce/papas.svg?branch=master
+       :target: https://travis-ci.org/edponce/papas
+
 ======
 README
 ======
