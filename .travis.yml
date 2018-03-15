@@ -1,15 +1,10 @@
 sudo: false
-
 language: python
-
 python:
-    - 'docs'
     - '3.5'
     - '3.6'
-
 install:
     - sudo apt install libopenmpi-dev openmpi-bin
     - pip install tox-travis
-
 script:
     - tox

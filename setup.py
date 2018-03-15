@@ -34,6 +34,7 @@ with open('tests_requirements.txt', 'r') as tests_req:
 # describing those features' requirements. These requirements will not be
 # automatically installed unless another package depends on them.
 extras_requirements = {
+    'lint': ['flake8>=3.5'],
     'reST': ['Sphinx>=1.6'],
 }
 
