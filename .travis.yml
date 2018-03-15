@@ -12,7 +12,7 @@ python:
 
 install:
     - sudo apt install libopenmpi-dev openmpi-bin
-#    - pip install tox tox-travis nose flake8 coverage
+    - pip install tox-travis
 
 script:
     - tox
