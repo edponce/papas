@@ -13,7 +13,7 @@ with open('README.rst', 'r') as readme, open('CHANGELOG.rst', 'r') as history:
 install_requirements = [
     'PyYAML>=3.12',
     'configparser>=3.5',
-    'mpi4py>=3.0',        # requires a MPI library (e.g., OpenMPI) 
+    'mpi4py>=3.0',        # requires a MPI library (e.g., OpenMPI)
     'networkx>=1.11',
 ]
 
