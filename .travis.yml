@@ -8,10 +8,11 @@ language: python
 
 python:
     - '3.5'
+    - '3.6'
 
 install:
     - sudo apt install libopenmpi-dev openmpi-bin
-    - pip install tox-travis flake8 coverage
+#    - pip install tox tox-travis nose flake8 coverage
 
 script:
     - tox

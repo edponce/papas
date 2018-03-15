@@ -14,6 +14,7 @@ install_requirements = [
     'PyYAML>=3.12',
     'configparser>=3.5',
     'mpi4py>=3.0',
+    'networkx>=1.11',
 ]
 
 # A list of strings specifying what other distributions need to be present
@@ -26,12 +27,8 @@ setup_requirements = [
 
 # A list of strings specifying what other distributions need to be present
 # for this package tests to run.
-tests_requirements = [
-    'tox>=2.9',
-    'tox-travis>=0.10',
-    'flake8>=3.5',
-    'coverage>=4.5.1',
-]
+with open('tests_requirements.txt', 'r') as tests_req:
+    tests_requirements = [l.strip() for l in tests_req.readlines()]
 
 # A dictionary mapping of names of "extra" features to lists of strings
 # describing those features' requirements. These requirements will not be
@@ -56,12 +53,13 @@ setup(
         'Environment :: Console',
         'Intended Audience :: Developers',
         'Intended Audience :: End Users/Desktop',
+        'Intended Audience :: Science/Research',
         'Operating System :: POSIX',
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
         'Topic :: Utilities',
         'Topic :: Software Development :: Libraries',
     ],

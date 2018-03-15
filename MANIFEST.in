@@ -2,6 +2,7 @@ include *.rst
 include LICENSE
 include papas/*.yml
 include papas/*.json
+include tests_requirements.txt
 recursive-include papas/apps *
 recursive-include papas/json_apps *
 recursive-include papas/yaml_apps *
