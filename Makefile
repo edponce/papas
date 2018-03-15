@@ -7,8 +7,8 @@ DOCDIR = docs
 
 help:
 	@echo "Please use 'make <target>' where <target> is one of"
-	@echo "  clean      to remove build, cached, compiled, and temporary package files"
-	@echo "  clean_doc  to remove documentation files"
+	@echo "  clean      to remove built, cached, compiled, and temporary package files"
+	@echo "  clean_doc  to remove built documentation files"
 	@echo "  clean_all  to remove coverage files (in addition to clean and clean_doc)"
 	@echo "  docs       to make standalone HTML files, and LaTeX files (pdflatex)"
 	@echo "  build      to make package distribution"

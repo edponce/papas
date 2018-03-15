@@ -7,4 +7,4 @@ recursive-include papas/apps *
 recursive-include papas/json_apps *
 recursive-include papas/yaml_apps *
 recursive-include papas/examples *
-recursive-include docs *.rst conf.py Makefile
+recursive-include docs *.rst conf.py

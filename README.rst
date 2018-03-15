@@ -1,7 +1,10 @@
 .. highlight:: shell
 
 .. image:: https://travis-ci.org/edponce/papas.svg?branch=master
-       :target: https://travis-ci.org/edponce/papas
+   :target: https://travis-ci.org/edponce/papas
+
+.. image:: https://coveralls.io/repos/github/edponce/papas/badge.svg?branch=master
+   :target: https://coveralls.io/github/edponce/papas?branch=master
 
 ======
 README

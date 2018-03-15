@@ -1,12 +1,9 @@
 sudo: false
 
-branches:
-    only:
-        - master
-
 language: python
 
 python:
+    - 'docs'
     - '3.5'
     - '3.6'
 

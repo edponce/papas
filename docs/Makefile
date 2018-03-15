@@ -4,7 +4,7 @@ SPHINXBUILD   = python3 -m sphinx
 SPHINXPROJ    =
 SOURCEDIR     = .
 BUILDDIR      = build
-SPHINXOPTS    = -d "$(BUILDDIR)/doctrees"
+SPHINXOPTS    =
 
 
 .PHONY: help clean Makefile
@@ -12,6 +12,7 @@ SPHINXOPTS    = -d "$(BUILDDIR)/doctrees"
 # Put it first so that "make" without argument is like "make help".
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+	@echo -e "  \033[01;34mclean\033[00m       to remove built documentation files"
 
 clean:
 	rm -rf "$(BUILDDIR)"
