@@ -1,5 +1,18 @@
-task: hello
-program: ./apps/hello.py
-params:
-    - --xparam = 10
-    - --yparam = 20
+hello:
+    program: apps/hello.py
+    params:
+        - xparam:
+            - 10
+            - 30
+        - yparam: 20
+    cmd: ${program}
+
+hello2:
+    program: ${hello:program}
+    params:
+        - infile: text.in
+        - ${hello:params}
+        - outfile: text.out
+    cmd: ${program} %{params:infile}
+    before:
+        - hello
