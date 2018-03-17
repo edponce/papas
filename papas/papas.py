@@ -27,6 +27,7 @@ from argparse import RawTextHelpFormatter
 import subprocess
 import json
 import yaml
+from configparse import MyParser
 
 
 # default_papas_conf_file = 'papas_conf.json'
@@ -223,6 +224,19 @@ def load_yaml_file(afile):
     return data
 
 
+def load_ini_file(afile):
+    '''
+    Load a INI configuration file.
+
+    Args:
+        afile (str): INI file
+
+    Returns:
+        dict: Configuration data
+    '''
+    return MyParser().load(afile)
+
+
 def validate_papas_conf(conf_data):
     '''
     Parse and validate application configuration data.
@@ -345,6 +359,8 @@ if __name__ == '__main__':
     # app_conf_data = load_json_file(args.app_conf_file)
     papas_conf_data = load_yaml_file(args.papas_conf_file)
     app_conf_data = load_yaml_file(args.app_conf_file)
+    # papas_conf_data = load_ini_file(args.papas_conf_file)
+    # app_conf_data = load_ini_file(args.app_conf_file)
 
     validate_papas_conf(papas_conf_data)
     process_app_conf(papas_conf_data, app_conf_data)

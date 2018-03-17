@@ -15,6 +15,7 @@ install_requirements = [
     'configparser>=3.5',
     'mpi4py>=3.0',        # requires a MPI library (e.g., OpenMPI)
     'networkx>=1.11',
+    'configparser>=3.5',
 ]
 
 # A list of strings specifying what other distributions need to be present
@@ -66,7 +67,7 @@ setup(
     ],
     platforms=['Linux'],
     zip_safe=False,
-    python_requires='>=3',
+    python_requires='>=3.2',
     include_package_data=True,
     packages=find_packages(exclude=['tests']),
     package_data={},

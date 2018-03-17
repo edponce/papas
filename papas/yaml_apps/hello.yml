@@ -1,6 +1,5 @@
-program:
-    ./apps/hello.py
-
+task: hello
+program: ./apps/hello.py
 params:
-    --xparam: '10'
-
+    - --xparam = 10
+    - --yparam = 20

@@ -1,8 +1,9 @@
 {
+    "task": "hello",
     "program": "./apps/hello.py",
-    "params":
-    {
-        "--xparam": "10"
-    }
+    "params": [
+        "--xparam = 10",
+        "--yparam = 20"
+    ]
 }
 
