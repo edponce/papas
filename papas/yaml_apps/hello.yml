@@ -1,18 +1,36 @@
-hello:
+- hello:
+    name: Hello world example
     program: apps/hello.py
-    params:
-        - xparam:
+    cmdargs:
+        xparam:
             - 10
             - 30
-        - yparam: 20
-    cmd: ${program}
+    command: ${program} --xparam ${cmdargs:xparam}
 
-hello2:
+
+- hello2:
+    name: Hello world example 2
     program: ${hello:program}
-    params:
-        - infile: text.in
-        - ${hello:params}
-        - outfile: text.out
-    cmd: ${program} %{params:infile}
-    before:
+    cmdargs:
+        xparam: ${hello:cmdargs:xparam}
+    environ:
+        OMP_NUM_THREADS:
+            - 2
+            - 4
+            - 8
+    command: ${program} --xparam ${cmdargs:xparam}
+    after:
         - hello
+
+
+- hello3:
+    name: Hello world example 3
+    program: ${hello:program}
+    files:
+        infile: text.in
+        outfile: text.out
+    environ:
+        OMP_NUM_THREADS: ${hello2:environ:OMP_NUM_THREADS}
+    command: ${program} -i ${files:infile} -o ${files:outfile}
+    after:
+        - hello2
