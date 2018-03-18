@@ -1,6 +1,6 @@
-- hello:
+hello:
     name: Hello world example
-    program: apps/hello.py
+    program: example/helloWorld/helloWorld.py
     cmdargs:
         xparam:
             - 10
@@ -8,7 +8,7 @@
     command: ${program} --xparam ${cmdargs:xparam}
 
 
-- hello2:
+hello2:
     name: Hello world example 2
     program: ${hello:program}
     cmdargs:
@@ -23,12 +23,13 @@
         - hello
 
 
-- hello3:
+hello3:
     name: Hello world example 3
     program: ${hello:program}
-    files:
-        infile: text.in
-        outfile: text.out
+    infiles:
+        - text.in
+    outfiles:
+        -text.out
     environ:
         OMP_NUM_THREADS: ${hello2:environ:OMP_NUM_THREADS}
     command: ${program} -i ${files:infile} -o ${files:outfile}

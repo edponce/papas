@@ -31,8 +31,8 @@ class MyInterpolation(configparser.ExtendedInterpolation):
         return ''.join(LL)
 
     def before_set(self, parser, section, option, value):
-        tmp_value = value.replace('$$', '') # escaped dollar signs
-        tmp_value = self._KEYCRE.sub('', tmp_value) # valid syntax
+        tmp_value = value.replace('$$', '')  # escaped dollar signs
+        tmp_value = self._KEYCRE.sub('', tmp_value)  # valid syntax
         if '$' in tmp_value:
             raise ValueError("invalid interpolation syntax in %r at "
                              "position %d" % (value, tmp_value.find('$')))
@@ -62,8 +62,10 @@ class MyInterpolation(configparser.ExtendedInterpolation):
             elif c == "{":
                 m = self._KEYCRE.match(rest)
                 if m is None:
-                    raise InterpolationSyntaxError(option, section,
-                        "bad interpolation variable reference %r" % rest)
+                    raise InterpolationSyntaxError(
+                        option, section,
+                        "bad interpolation variable reference %r" % rest
+                    )
                 path = m.group(1).split(':')
                 rest = rest[m.end():]
                 sect = section
@@ -165,5 +167,5 @@ class MyParser(configparser.ConfigParser):
     def to_dict(self):
         task_dicts = {}
         for task in self.sections():
-           task_dicts.update({task: {**self[task]}})
+            task_dicts.update({task: {**self[task]}})
         return task_dicts

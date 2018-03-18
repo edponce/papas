@@ -1,6 +1,4 @@
-'''
-PaPaS module
-'''
+"""PaPaS module"""
 __title__ = 'PaPaS'
 __version__ = '1.0'
 __description__ = 'A generic framework for parallel parameter studies'

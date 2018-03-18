@@ -25,6 +25,8 @@ configuration files and task parameter descriptions.
 * A "name" can be specified using any alphanumeric character, [0-9a-zA-Z].
 
 * Predefined "names" are:
+    * "name" - description of task
+    * "environ" - specifies environment variables
     * "command" - provide the command line string to run the task
     * "after" - specifies dependencies between tasks
 
@@ -53,7 +55,7 @@ command: ${program} --xparam ${cmdargs:xparam}
 '''
 
 
-'''
+"""
 Intrinsic defaults can be specified by passing them into the
 PaPaSParser constructor as a dictionary.
 
@@ -188,16 +190,6 @@ ConfigParser -- responsible for parsing a list of
         between keys and values are surrounded by spaces.
 """
 
-from collections.abc import MutableMapping
-from collections import OrderedDict as _default_dict, ChainMap as _ChainMap
-import functools
-import io
-import itertools
-import os
-import re
-import sys
-import warnings
-
 
 from configparser import (
     ParsingError, InterpolationSyntaxError, InterpolationDepthError,
@@ -229,8 +221,8 @@ class MyInterpolation(configparser.ExtendedInterpolation):
         return ''.join(LL)
 
     def before_set(self, parser, section, option, value):
-        tmp_value = value.replace('$$', '') # escaped dollar signs
-        tmp_value = self._KEYCRE.sub('', tmp_value) # valid syntax
+        tmp_value = value.replace('$$', '')  # escaped dollar signs
+        tmp_value = self._KEYCRE.sub('', tmp_value)  # valid syntax
         if '$' in tmp_value:
             raise ValueError("invalid interpolation syntax in %r at "
                              "position %d" % (value, tmp_value.find('$')))
@@ -260,8 +252,10 @@ class MyInterpolation(configparser.ExtendedInterpolation):
             elif c == "{":
                 m = self._KEYCRE.match(rest)
                 if m is None:
-                    raise InterpolationSyntaxError(option, section,
-                        "bad interpolation variable reference %r" % rest)
+                    raise InterpolationSyntaxError(
+                        option, section,
+                        "bad interpolation variable reference %r" % rest
+                    )
                 path = m.group(1).split(':')
                 rest = rest[m.end():]
                 sect = section
@@ -363,5 +357,5 @@ class MyParser(configparser.ConfigParser):
     def to_dict(self):
         task_dicts = {}
         for task in self.sections():
-           task_dicts.update({task: {**self[task]}})
+            task_dicts.update({task: {**self[task]}})
         return task_dicts

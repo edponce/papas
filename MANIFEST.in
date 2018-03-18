@@ -1,10 +1,10 @@
-include *.rst
-include LICENSE
-include papas/*.yml
-include papas/*.json
 include tests_requirements.txt
-recursive-include papas/apps *
-recursive-include papas/json_apps *
-recursive-include papas/yaml_apps *
-recursive-include papas/examples *
+include *.rst
 recursive-include docs *.rst conf.py
+include LICENSE
+include papas/*.py
+recursive-include papas/papas_conf *
+recursive-include papas/parsers *.py
+recursive-include papas/graphs *.py
+recursive-include papas/tasks_conf *
+recursive-include papas/examples *

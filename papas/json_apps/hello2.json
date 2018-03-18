@@ -1,8 +1,0 @@
-{
-    "program": "python3 apps/hello.py",
-    "params":
-    {
-        "--xparam": "10"
-    }
-}
-
