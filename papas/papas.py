@@ -1,358 +1,192 @@
 #!/usr/bin/env python3
 
 
-"""PaPaS: A lightweight and generic framework for parallel parameter studies
-
-This program controls execution of workflows/programs for conducting
-parameter studies in a parallel system.
-A YAML or JSON configuration file is used to specify parameters with all their
-possible values.
-Parameters should be expected either from files, environment variables,
-and/or command line arguments.
-
-
-Example
-=======
-
-python3 papas.py -c papas_conf.json -a hello.json
-
-Todo:
-    * Create parser for custom regex expressions
-    * Support workflow
-    * Need function to substitute '${...}' from configuration files
-    * Need function to split strings into list, but maintaining quoted strings
-"""
-
-
 import sys
 import os
-import argparse
 import subprocess
 import json
 import yaml
-from parsers.configparse import MyParser
+import logging
 
 
-# default_papas_conf_file = 'papas_conf/PaPaS.json'
-default_papas_conf_file = 'papas_conf/PaPaS.yml'
-"""str: Default PaPaS JSON configuration file"""
-
-args = None
-"""obj: argparse.Namespace object with command line arguments"""
+__all__ = ['PaPaSDriver']
 
 
-def print_log(msg='', *, end='\n', file=sys.stdout):
-    """Print output messages
-
-    Args:
-        msg (str, optional): Information to print
-            (default is empty string)
-        end (char, optional): Character to print at end of message
-            (default is newline)
-        file (obj, optional): File descriptor for output
-            (default is sys.stdout)
-    """
-    print(msg, end=end, file=file)
-
-
-def warn_log(msg='', *, end='\n', file=sys.stdout):
-    """Print warning messages
-
-    Args:
-        msg (str, optional): Information to print
-            (default is empty string)
-        end (char, optional): Character to print at end of message
-            (default is newline)
-        file (obj, optional): File descriptor for output
-            (default is sys.stdout)
-    """
-    print('WARN: ' + msg, end=end, file=file)
+def init_logger(fn=__name__ + '.log'):
+    """Configure logging"""
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - '
+                                      '%(levelname)s - %(message)s',
+                                  datefmt='%Y-%m-%d %H:%M:%S')
+    log_file_handler = logging.FileHandler(fn)
+    log_file_handler.setLevel(logging.DEBUG)
+    log_file_handler.setFormatter(formatter)
+    logger.addHandler(log_file_handler)
+    log_stream_handler = logging.StreamHandler()
+    log_stream_handler.setLevel(logging.INFO)
+    log_stream_handler.setFormatter(formatter)
+    logger.addHandler(log_stream_handler)
+    return logger
 
 
-def error_log(msg='', *, end='\n', file=sys.stderr):
-    """Print error messages
+class PaPaSDriver:
 
-    Args:
-        msg (str, optional): Information to print
-            (default is empty string)
-        end (char, optional): Character to print at end of message
-            (default is newline)
-        file (obj, optional): File descriptor for output
-            (default is sys.stderr)
-    """
-    print('ERROR: ' + msg, end=end, file=file)
+    def __init__(self, **conf):
+        self.logger = init_logger()
+        self.papas_data = {}
+        self.app_data = {}
 
+        if 'conf' in conf:
+            self.load_papas(conf['conf'])
+        if 'app' in conf:
+            self.load_app(conf['app'])
 
-def debug_log(msg='', *, end='\n', file=sys.stdout):
-    """Print debugging messages
+    def load_conf(self, conf=''):
+        """Load PaPaS configuration
 
-    Args:
-        msg (str, optional): Information to print
-            (default is empty string)
-        end (char, optional): Character to print at end of message
-            (default is newline)
-        file (obj, optional): File descriptor for output
-            (default is sys.stderr)
-    """
-    if args.conf_debug:
-        print('DEBUG: ' + msg, end=end, file=file)
+        Args:
+            conf (file|str|dict): YAML, JSON, or INI file
 
+        Returns:
+            dict: Configuration data
+        """
+        data = {}
+        # It is a dict
+        if isinstance(conf, dict):
+            self.logger.debug('Loading PaPaS configuration from existing '
+                              'dictionary')
+            data = conf
+        elif isinstance(conf, str):
+            # It is an existing file
+            if os.path.isfile(conf):
+                fn, xt = os.path.splitext(conf)
+                ext = xt[1:].lower()
+                if ext in ('yaml', 'yml'):
+                    self.logger.debug('Loading PaPaS configuration from '
+                                      'YAML file')
+                    with open(conf, 'r') as fd:
+                        data = yaml.load(fd)
+                elif ext in ('json'):
+                    self.logger.debug('Loading PaPaS configuration from '
+                                      'JSON file')
+                    with open(conf, 'r') as fd:
+                        data = json.load(fd)
+                elif ext in ('ini'):
+                    self.logger.debug('Loading PaPaS configuration from '
+                                      'INI file')
+                    # with open(conf, 'r') as fd:
+                    #    data = ini.load(fd)
+            # Check YAML/JSON/INI string
+            else:
+                try:
+                    data = yaml.load(conf)
+                except:
+                    pass
+                else:
+                    self.logger.debug('Loading PaPaS configuration from '
+                                      'YAML string')
+                try:
+                    data = json.load(conf)
+                except:
+                    pass
+                else:
+                    self.logger.debug('Loading PaPaS configuration from '
+                                      'JSON string')
+                # try:
+                #    data = ini.load(conf)
+                # except:
+                #    pass
+                # else:
+                #    self.logger.debug('Loading PaPaS configuration from '
+                #                      'INI string')
 
-def parse_args():
-    """Parse and validate command line arguments"""
+        return data
 
-    parser = argparse.ArgumentParser(
-        prog=__file__,
-        description='PaPaS: Framework for parallel parameter studies',
-        formatter_class=argparse.RawTextHelpFormatter
-    )
+    def load_papas(self, conf=''):
+        """Load PaPaS configuration
+        Data is validated and organized
 
-    parser.add_argument(
-        '-d', '--debug',
-        action='store_true',
-        dest='conf_debug',
-        help='Enable/disable debugging operations\n'
-             'Default is disabled'
-    )
+        Args:
+            conf (file|str|dict): YAML, JSON, or INI file
 
-    parser.add_argument(
-        '-c', '--conf',
-        type=str,
-        dest='papas_conf_file',
-        default=default_papas_conf_file,
-        help='PaPaS YAML/JSON configuration file\n'
-             'Default is \'' + default_papas_conf_file + '\''
-    )
+        Returns:
+        """
+        data = self.load_conf(conf)
+        self.papas_data = self.validate_papas(data)
 
-    parser.add_argument(
-        '-a', '--app',
-        type=str,
-        dest='app_conf_file',
-        default='',
-        help='Application YAML/JSON configuration file'
-    )
+    def dump_papas(self):
+        if self.papas_data:
+            pass
 
-    global args
-    args = parser.parse_args()
-
-    # Validate options
-    err = 0
-    if not validate_file(args.papas_conf_file):
-        err += 1
-
-    if not validate_file(args.app_conf_file):
-        err += 1
-
-    if err:
-        print_log()
-        parser.print_help()
-        sys.exit(os.EX_USAGE)
-
-
-def validate_file(afile, *, dir=False, read=True, write=False, execute=False):
-    """Check access properties of a given file or directory, if it exists
-    Only checks for properties that are set to True, others are ignored.
-
-    Args:
-        afile (str): File or directory to check
-        dir (bool, optional): Specify if it is a file or directory
-            (default is False)
-        read (bool, optional): Check if path is readable
-            (default is True)
-        write (bool, optional): Check if path is writeable
-            (default is False)
-        execute (bool, optional): Check if path is executable
-            (default is False)
-
-    Returns:
-        bool: True if all properties set are supported, else False
-
-    Todo:
-        * Remove print messages, useful for debugging only
-    """
-    prop_msg = []
-    if not dir and not os.path.isfile(afile):
-        prop_msg += ['file does not exists']
-    elif dir and not os.path.isdir(afile):
-        prop_msg += ['directory does not exists']
-    else:
-        if read and not os.access(afile, os.R_OK):
-            prop_msg += ['is not readable']
-        if write and not os.access(afile, os.W_OK):
-            prop_msg += ['is not writable']
-        if execute and not os.access(afile, os.X_OK):
-            prop_msg += ['is not executable']
-
-    if prop_msg:
-        debug_log('\'%s\' %s' % (afile, ', '.join(prop_msg)))
-        return False
-    return True
-
-
-def load_json_file(afile):
-    """Load a JSON configuration file
-
-    Args:
-        afile (str): JSON file
-
-    Returns:
-        dict: Configuration data
-    """
-    data = {}
-    with open(afile, 'r') as f:
-        data = json.load(f)
-    return data
-
-
-def load_yaml_file(afile):
-    """Load a YAML configuration file
-
-    Args:
-        afile (str): YAML file
-
-    Returns:
-        dict: Configuration data
-    """
-    data = {}
-    with open(afile, 'r') as f:
-        data = yaml.load(f)
-    return data
-
-
-def load_ini_file(afile):
-    """Load a INI-based configuration file
-
-    Args:
-        afile (str): INI file
-
-    Returns:
-        dict: Configuration data
-    """
-    return MyParser().load(afile)
-
-
-def validate_papas_conf(conf_data):
-    """Parse and validate application configuration data
-    PaPaS mandatory keys are: extensions
-
-    Args:
-        conf_data (dict): Application configuration data
-    """
-    pass
-
-
-def validate_app_conf(conf_data):
-    """Validate application configuration data
-
-    Args:
-        conf_data (dict): Application configuration data
-
-    Returns:
-        bool: True if configurations is valid, else False
-    """
-    app_keys = ['command']
-    if isinstance(conf_data, dict):
-        for d in conf_data.keys():
-            for k in app_keys:
-                if k not in conf_data[d].keys():
-                    return False
-    elif isinstance(conf_data, list):
-        for l in conf_data:
-            for k in app_keys:
-                if k not in l.keys():
-                    return False
-    return True
-
-
-def process_app_conf(papas_conf_data, app_conf_data):
-    """Parse and process application configuration data
-
-    Args:
-        papas_conf_data (dict): PaPaS configuration data
-        app_conf_data (dict): Application configuration data
-
-    Todo:
-        * Handle filenames with spaces
-        * Parse command line tokens
-    """
-    if not validate_app_conf(app_conf_data):
-        error_log('invalid application configuration.')
-        return
-
-    # Construct list of given command line
-    """ Todo: Handle filenames with spaces
-        * In JSON conf need to place filename between \'escaped quotes\'.
-        * Before split, check for quotes and extract as a single token.
-          Use [idx for idx, ltr in enumerate(prog_name) if ltr == '\'']
-          to get all indices of quotes.
-    """
-    prog_name = app_conf_data['command']
-    cmd = prog_name.split()
-
-    # Parse command line and identify executable program/file
-    """Todo: Parse command line tokens
-        * If single token:
-            - If executable, then assume is an executable program as is.
-              If no extension, assume is a command seen in PATH.
-              If extension:
-                  * If begins with slash append '.'
-                  * If no slash append './'
-            - If not executable, assume is a script identified by extension
-        * If multiple tokens:
-            - If has environment variables, first token not an env variable
-              apply the single token considerations
-            - If no environment variables, use first token and
-              apply the single token considerations
-        * In configuration dictionaries, can use '%' as a substitute for key.
-    """
-    if len(cmd) == 1:
-        if validate_file(cmd[0], execute=True):
-            debug_log('File is executable')
+    def print_papas(self):
+        if self.papas_data:
+            print(self.papas_data)
         else:
-            fn, fx = os.path.splitext(cmd[0])
+            self.logger.debug('No PaPaS configuration data to print')
 
-            # Check if file extension is valid
-            prog_tmp_str = papas_conf_data['file_extensions'].get(fx[1:])
-            if not prog_tmp_str:
-                error_log('file not executable, no supported file extension')
-                return
+    def validate_papas(self, data):
+        """Validate and clean configuration data"""
+        return data
 
-            if prog_tmp_str.find('%') >= 0:
-                prog_str = prog_tmp_str.replace('%', fn)
-                cmd = prog_str.split()
-            else:
-                cmd = prog_tmp_str.split() + cmd
+    def load_app(self, conf=''):
+        """Load application configuration
+        Data is validated and organized
 
-    # Parse program parameters
-    if 'params' in app_conf_data:
-        for param, vals in app_conf_data['params'].items():
-            if isinstance(vals, list) and len(vals) > 1:
-                for val in vals:
-                    cmd.append(param)
-                    cmd.append(val)
-            else:
-                cmd.append(param)
-                cmd.append(vals)
+        Args:
+            conf (file|str|dict): YAML, JSON, or INI file
 
-    print(cmd)
-    subprocess.run(cmd)
+        Returns:
+        """
+        data = self.load_conf(conf)
+        self.app_data = self.validate_app(data)
 
 
-if __name__ == '__main__':
-    # from timeit import Timer
-    # t = Timer(
-    #    'parse_args(); load_json_file(args.papas_conf_file)',
-    #    'from __main__ import parse_args, load_json_file'
-    # )
-    # print_log(t.timeit(number=100))
+    def dump_app(self):
+        pass
 
-    parse_args()
-    # papas_conf_data = load_json_file(args.papas_conf_file)
-    # app_conf_data = load_json_file(args.app_conf_file)
-    papas_conf_data = load_yaml_file(args.papas_conf_file)
-    app_conf_data = load_yaml_file(args.app_conf_file)
-    # papas_conf_data = load_ini_file(args.papas_conf_file)
-    # app_conf_data = load_ini_file(args.app_conf_file)
+    def print_app(self):
+        if self.app_data:
+            print(self.app_data)
+        else:
+            self.logger.debug('No application configuration data to print')
 
-    validate_papas_conf(papas_conf_data)
-    process_app_conf(papas_conf_data, app_conf_data)
+    def validate_app(self):
+        """Validate application configuration data
+
+        Args:
+            conf_data (dict): Application configuration data
+
+        Returns:
+            bool: True if configurations is valid, else False
+        """
+        app_keys = ['command']
+        if isinstance(conf_data, dict):
+            for d in conf_data.keys():
+                for k in app_keys:
+                    if k not in conf_data[d].keys():
+                        return False
+        elif isinstance(conf_data, list):
+            for l in conf_data:
+                for k in app_keys:
+                    if k not in l.keys():
+                        return False
+        return True
+
+    def interpolate(self):
+        pass
+
+    def resolve_dependencies(self):
+        pass
+
+    def run(self):
+        pass
+
+    def detect_system(self):
+        pass
+
+    def build_batch_script(self):
+        pass
+
+    def build_ssh_script(self):
+        pass
