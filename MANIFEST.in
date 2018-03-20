@@ -1,6 +1,6 @@
 include tests_requirements.txt
 include *.rst
-recursive-include docs *.rst conf.py
+recursive-include docs *.rst *.py
 include LICENSE
 include papas/*.py
 recursive-include papas/papas_conf *

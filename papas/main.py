@@ -18,10 +18,10 @@ python3 papas.py -a tasks_conf/YAML_conf/helloWorld.yml
 """
 
 
-import sys
-import os
+# import sys
+# import os
 import argparse
-import papas
+from papas import PaPaSDriver
 
 
 default_conf_file = 'papas_conf/PaPaS.yml'
@@ -92,7 +92,7 @@ def validate_file(fn, *, dir=False, read=True, write=False, execute=False):
             prop_msg += ['is not executable']
 
     if prop_msg:
-        logger.debug("'%s' %s" % (fn, ', '.join(prop_msg)))
+        print("'%s' %s" % (fn, ', '.join(prop_msg)))
         return False
     return True
 
@@ -109,7 +109,7 @@ def process_app_conf(conf_data, app_conf_data):
         * Parse command line tokens
     """
     if not validate_app_conf(app_conf_data):
-        logger.error('invalid application configuration.')
+        print('invalid application configuration.')
         return
 
     # Construct list of given command line
@@ -140,14 +140,14 @@ def process_app_conf(conf_data, app_conf_data):
     """
     if len(cmd) == 1:
         if validate_file(cmd[0], execute=True):
-            logger.debug('File is executable')
+            print('File is executable')
         else:
             fn, fx = os.path.splitext(cmd[0])
 
             # Check if file extension is valid
             prog_tmp_str = conf_data['file_extensions'].get(fx[1:])
             if not prog_tmp_str:
-                logger.error('file not executable, no supported file extension')
+                print('file not executable, no supported file extension')
                 return
 
             if prog_tmp_str.find('%') >= 0:
@@ -173,6 +173,6 @@ def process_app_conf(conf_data, app_conf_data):
 
 if __name__ == '__main__':
     args = parse_args()
-    pp = papas.PaPaSDriver(**vars(args))
+    pp = PaPaSDriver(**vars(args))
     pp.print_papas()
     pp.print_app()

@@ -5,13 +5,19 @@ MODULES
 PaPaS
 =====
 
-.. automodule:: papas
+.. automodule:: papas.papas
     :members:
     :undoc-members:
 
-.. automodule:: parsers
+Parsers
+=======
+
+.. automodule:: parsers.parsers
     :members:
     :undoc-members:
+
+Exceptions
+==========
 
 .. automodule:: exceptions
     :members:

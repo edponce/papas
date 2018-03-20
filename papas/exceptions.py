@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 
 
-__all__ = ['InterpolationError']
-
-
 class Error(Exception):
     '''Base class for exceptions'''
 

@@ -15,7 +15,8 @@ install_requirements = [
     'configparser>=3.5',
     'mpi4py>=3.0',        # requires a MPI library (e.g., OpenMPI)
     'networkx>=1.11',
-    'configparser>=3.5'
+    'configparser>=3.5',
+    'Jinja2>=2.9'
 ]
 
 # A list of strings specifying what other distributions need to be present

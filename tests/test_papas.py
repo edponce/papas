@@ -8,11 +8,11 @@ from papas import papas
 class TestConfigurationFiles(unittest.TestCase):
 
     def test_loadYAMLTaskConf(self):
-        t = load_yaml_file('papas/tasks_conf/YAML_conf/helloWorld.yml')
+        t = papas.load_yaml_file('papas/tasks_conf/YAML_conf/helloWorld.yml')
         self.assertTrue(len(t) > 0)
 
     def test_loadJSONTaskConf(self):
-        t = load_json_file('papas/tasks_conf/JSON_conf/helloWorld.json')
+        t = papas.load_json_file('papas/tasks_conf/JSON_conf/helloWorld.json')
         self.assertTrue(len(t) > 0)
 
     def test_validateTaskConf(self):

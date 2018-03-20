@@ -2,13 +2,14 @@
 *.py[co]
 .tox/
 .pytest_cache/
-.coverage*
+.coverage-*
 *.eggs/
 *egg-info/
-*/__pycache__/
+*__pycache__/
 *build/
 *dist/
 htmlcov/
 ref/
 *.bak
 *.log
+flake8.out

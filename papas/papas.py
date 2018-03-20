@@ -1,25 +1,25 @@
 #!/usr/bin/env python3
 
 
-import sys
+__all__ = ['PaPaSDriver']
+
+
 import os
-import subprocess
+# import sys
+# import subprocess
 import json
 import yaml
 import logging
 
 
-__all__ = ['PaPaSDriver']
-
-
-def init_logger(fn=__name__ + '.log'):
+def init_logger():
     """Configure logging"""
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - '
                                       '%(levelname)s - %(message)s',
                                   datefmt='%Y-%m-%d %H:%M:%S')
-    log_file_handler = logging.FileHandler(fn)
+    log_file_handler = logging.FileHandler(__name__ + '.log')
     log_file_handler.setLevel(logging.DEBUG)
     log_file_handler.setFormatter(formatter)
     logger.addHandler(log_file_handler)
@@ -27,6 +27,7 @@ def init_logger(fn=__name__ + '.log'):
     log_stream_handler.setLevel(logging.INFO)
     log_stream_handler.setFormatter(formatter)
     logger.addHandler(log_stream_handler)
+
     return logger
 
 
@@ -57,6 +58,11 @@ class PaPaSDriver:
             self.logger.debug('Loading PaPaS configuration from existing '
                               'dictionary')
             data = conf
+        # It is a list
+        elif isinstance(conf, list):
+            self.logger.debug('Loading PaPaS configuration from existing '
+                              'list')
+            data = conf
         elif isinstance(conf, str):
             # It is an existing file
             if os.path.isfile(conf):
@@ -81,14 +87,24 @@ class PaPaSDriver:
             else:
                 try:
                     data = yaml.load(conf)
-                except:
+                except yaml.YAMLError as exc:
+                    if hasattr(exc, 'problem_mark'):
+                        mark = exc.problem_mark
+                        self.logger.info('Error loading configuration data'
+                                         ' as YAML format (%s:%s): %s' %
+                              (mark.line + 1, mark.column + 1, exc))
+                    else:
+                        self.logger.info('Error loading configuration data'
+                                         ' as YAML format: ', exc)
                     pass
                 else:
                     self.logger.debug('Loading PaPaS configuration from '
                                       'YAML string')
                 try:
                     data = json.load(conf)
-                except:
+                except json.JSONDecodeError as exc:
+                    self.logger.info('Error loading configuration data'
+                                     ' as JSON format: ', exc)
                     pass
                 else:
                     self.logger.debug('Loading PaPaS configuration from '
@@ -141,7 +157,6 @@ class PaPaSDriver:
         data = self.load_conf(conf)
         self.app_data = self.validate_app(data)
 
-
     def dump_app(self):
         pass
 
@@ -151,23 +166,23 @@ class PaPaSDriver:
         else:
             self.logger.debug('No application configuration data to print')
 
-    def validate_app(self):
+    def validate_app(self, data):
         """Validate application configuration data
 
         Args:
-            conf_data (dict): Application configuration data
+            data (dict): Application configuration data
 
         Returns:
             bool: True if configurations is valid, else False
         """
         app_keys = ['command']
-        if isinstance(conf_data, dict):
-            for d in conf_data.keys():
+        if isinstance(data, dict):
+            for d in data.keys():
                 for k in app_keys:
-                    if k not in conf_data[d].keys():
+                    if k not in data[d].keys():
                         return False
-        elif isinstance(conf_data, list):
-            for l in conf_data:
+        elif isinstance(data, list):
+            for l in data:
                 for k in app_keys:
                     if k not in l.keys():
                         return False
