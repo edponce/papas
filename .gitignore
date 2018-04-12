@@ -1,3 +1,4 @@
+*.swp
 *.py[co]
 .tox/
 .pytest_cache/
@@ -8,3 +9,7 @@
 *build/
 *dist/
 htmlcov/
+ref/
+*.bak
+*.log
+flake8.out
