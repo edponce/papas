@@ -19,7 +19,7 @@ python3 papas.py -a tasks_conf/YAML_conf/helloWorld.yml
 
 
 # import sys
-# import os
+import os
 import argparse
 from papas import PaPaSDriver
 
@@ -57,6 +57,7 @@ def parse_args():
     return parser.parse_args()
 
 
+'''
 def validate_file(fn, *, dir=False, read=True, write=False, execute=False):
     """Check access properties of a given file or directory, if it exists
     Only checks for properties that are set to True, others are ignored.
@@ -169,6 +170,7 @@ def process_app_conf(conf_data, app_conf_data):
 
     print(cmd)
     subprocess.run(cmd)
+'''
 
 
 if __name__ == '__main__':
