@@ -11,4 +11,5 @@ Development Lead
 Contributors
 ============
 
-* None
+* Gregory D. Peterson <gdp@utk.edu>
+* Mihaela Dimovska <mdimovska@vols.utk.edu>

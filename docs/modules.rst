@@ -12,13 +12,13 @@ PaPaS
 Parsers
 =======
 
-.. automodule:: parsers.parsers
+.. automodule:: papas.parsers.parsers
     :members:
     :undoc-members:
 
 Exceptions
 ==========
 
-.. automodule:: exceptions
+.. automodule:: papas.exceptions
     :members:
     :undoc-members:

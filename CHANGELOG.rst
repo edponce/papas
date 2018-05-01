@@ -1,3 +1,8 @@
+=========
+CHANGELOG
+=========
+
+
 0.4 (2018-03-14)
 ================
 
@@ -17,6 +22,6 @@ Bug fixes
 0.2 (2018-03-08)
 ================
 
-* Initial implementation with simple JSON/YAML configurations
+* Initial implementation with simple INI/JSON/YAML configurations
 
 * Initial documentation

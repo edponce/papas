@@ -57,7 +57,6 @@ def parse_args():
     return parser.parse_args()
 
 
-'''
 def validate_file(fn, *, dir=False, read=True, write=False, execute=False):
     """Check access properties of a given file or directory, if it exists
     Only checks for properties that are set to True, others are ignored.
@@ -97,7 +96,7 @@ def validate_file(fn, *, dir=False, read=True, write=False, execute=False):
         return False
     return True
 
-
+'''
 def process_app_conf(conf_data, app_conf_data):
     """Parse and process application configuration data
 

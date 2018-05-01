@@ -1,6 +1,10 @@
+=============
+SPECIFICATION
+=============
+
+
 PaPaSParser: INI-based Format
 =============================
-
 
 This section provides the specification for PaPaSParser, used in both
 configuration files and task parameter descriptions. This specification
@@ -47,33 +51,35 @@ and lists.
 * A single-line comment is a line that starts with a hash sign, '#'.
 
 
-Example
-=======
+INI Example
+-----------
 
-# This example describes two tasks, one called 'hello' that executes the
-# program 'helloWorld.py' twice due to interpolation of values given in
-# 'xparam'. The second task is called 'hello2' and has the same execution
-# model as task 'hello'. Note that intra-task and inter-task interpolation
-# are used to specify 'values' and it executes after task 'hello'.
+.. code-block:: text
 
-[hello]
-name: Hello world example
-program: examples/helloWorld/helloWorld.py
-cmdargs:
-    xparam:
-        10
-        30
-command: ${program} --xparam ${cmdargs:xparam}
+  # This example describes two tasks, one called 'hello' that executes the
+  # program 'helloWorld.py' twice due to interpolation of values given in
+  # 'xparam'. The second task is called 'hello2' and has the same execution
+  # model as task 'hello'. Note that intra-task and inter-task interpolation
+  # are used to specify 'values' and it executes after task 'hello'.
+
+  [hello]
+  name: Hello world example
+  program: examples/helloWorld/helloWorld.py
+  cmdargs:
+      xparam:
+          10
+          30
+  command: ${program} --xparam ${cmdargs:xparam}
 
 
-[hello2]
-name: Hello world example 2
-program: ${hello:program}
-cmdargs:
-    xparam: ${hello:cmdargs:xparam}
-command: ${program} --xparam ${cmdargs:xparam}
-after:
-    hello
+  [hello2]
+  name: Hello world example 2
+  program: ${hello:program}
+  cmdargs:
+      xparam: ${hello:cmdargs:xparam}
+  command: ${program} --xparam ${cmdargs:xparam}
+  after:
+      hello
 
 
 PaPaSParser: YAML Format (recommended)
@@ -120,32 +126,34 @@ follows the YAML format which is based on dictionaries and lists.
 * A single-line comment is a line that starts with a hash sign, '#'.
 
 
-Example
-=======
+YAML Example
+------------
 
-hello:
-    name: Hello world example
-    program: example/helloWorld/helloWorld.py
-    cmdargs:
-        xparam:
-            - 10
-            - 30
-    command: ${program} --xparam ${cmdargs:xparam}
+.. code-block:: text
+
+  hello:
+      name: Hello world example
+      program: example/helloWorld/helloWorld.py
+      cmdargs:
+          xparam:
+              - 10
+              - 30
+      command: ${program} --xparam ${cmdargs:xparam}
 
 
-hello2:
-    name: Hello world example 2
-    program: ${hello:program}
-    cmdargs:
-        xparam: ${hello:cmdargs:xparam}
-    environ:
-        OMP_NUM_THREADS:
-            - 2
-            - 4
-            - 8
-    command: ${program} --xparam ${cmdargs:xparam}
-    after:
-        - hello
+  hello2:
+      name: Hello world example 2
+      program: ${hello:program}
+      cmdargs:
+          xparam: ${hello:cmdargs:xparam}
+      environ:
+          OMP_NUM_THREADS:
+              - 2
+              - 4
+              - 8
+      command: ${program} --xparam ${cmdargs:xparam}
+      after:
+          - hello
 
 
 PaPaSParser: JSON Format
@@ -186,29 +194,31 @@ follows the JSON format which is based on dictionaries and lists.
 * Comments are not allowed, use a dummy 'name/value' pair.
 
 
-Example
-=======
+JSON Example
+------------
 
-{
-    "hello": {
-        "name": "Hello world example",
-        "program": "examples/helloWorld/helloWorld.py",
-        "cmdargs": {
-            "xparam": [10, 30]
-        },
-        "command": "${program} --xparam ${cmdargs:xparam}"
-    },
+.. code-block:: text
 
-    "hello2": {
-        "name": "Hello world example 2",
-        "program": "${hello:program}",
-        "cmdargs": {
-            "xparam": "${hello:cmdargs:xparam}"
-        },
-        "environ": {
-            "OMP_NUM_THREADS": [2, 4, 8]
-        },
-        "command": "${program} --xparam ${cmdargs:xparam}",
-        "after": ["hello"]
-    }
-}
+  {
+      "hello": {
+          "name": "Hello world example",
+          "program": "examples/helloWorld/helloWorld.py",
+          "cmdargs": {
+              "xparam": [10, 30]
+          },
+          "command": "${program} --xparam ${cmdargs:xparam}"
+      },
+
+      "hello2": {
+          "name": "Hello world example 2",
+          "program": "${hello:program}",
+          "cmdargs": {
+              "xparam": "${hello:cmdargs:xparam}"
+          },
+          "environ": {
+              "OMP_NUM_THREADS": [2, 4, 8]
+          },
+          "command": "${program} --xparam ${cmdargs:xparam}",
+          "after": ["hello"]
+      }
+  }
