@@ -53,7 +53,7 @@ def print_digraph(G=None, roots=[]):
         for prereq, target in nx.dfs_edges(G, s):
             spacer[target] = spacer[prereq] + 2
             print('{spacer}+-{t}'.format(spacer=' ' * spacer[prereq],
-                                         t=target))
+                  t=target))
 
 
 def json_digraph(G=None, root=None):
