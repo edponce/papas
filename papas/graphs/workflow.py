@@ -5,40 +5,16 @@ __all__ = ['WorkflowGraph']
 
 
 import utils.logger
-import graphviz
-import copy
+from graphviz import Digraph
+from copy import deepcopy
 import json
+from graphs.styles import graph_styles
 
 
-class WorkflowGraph(graphviz.Digraph):
+class WorkflowGraph(Digraph):
 
     _workflow_id = 0
     _logger = utils.logger.init_logger('WorkflowGraph')
-    _styles = {
-        'graph': {
-            'label': 'Workflow Graph',
-            'fontsize': '16',
-            'fontcolor': 'white',
-            'bgcolor': '#333333',
-            'rankdir': 'TB'
-        },
-        'nodes': {
-            'fontname': 'Helvetica',
-            'shape': 'hexagon',
-            'fontcolor': 'white',
-            'color': 'white',
-            'style': 'filled',
-            'fillcolor': '#006699'
-        },
-        'edges': {
-            'style': 'dashed',
-            'color': 'white',
-            'arrowhead': 'open',
-            'fontname': 'Courier',
-            'fontsize': '12',
-            'fontcolor': 'white'
-        }
-    }
 
     @property
     def nodes(self):
@@ -51,6 +27,7 @@ class WorkflowGraph(graphviz.Digraph):
 
         for node in nodelist:
             try:
+                # accept lists because json.dump() converts tuples to lists
                 if isinstance(node, list):
                     node = tuple(node)
 
@@ -73,7 +50,7 @@ class WorkflowGraph(graphviz.Digraph):
                     raise ValueError
 
             except ValueError as err:
-                WorkflowGraph._logger.error('{0}: Nodes must be a list of strings, {1}'.format(self.id, err))
+                type(self)._logger.error('{0}: Nodes must be a list of strings, {1}'.format(self._id, err))
 
     @property
     def edges(self):
@@ -86,14 +63,17 @@ class WorkflowGraph(graphviz.Digraph):
 
         for edge in edgelist:
             try:
+                # accept lists because json.dump() converts tuples to lists
                 if isinstance(edge, list):
                     edge = tuple(edge)
                 elif not isinstance(edge, tuple):
                     raise ValueError
 
-                # edge with attributes
+                # accept lists because json.dump() converts tuples to lists
                 if isinstance(edge[0], list):
                     edge[0] = tuple(edge[0])
+
+                # edge with attributes
                 if (isinstance(edge[0], tuple) and len(edge[0]) == 2) \
                     and isinstance(edge[1], dict):
                     if all([(isinstance(e, str) and e) for e in edge[0]]):
@@ -114,15 +94,41 @@ class WorkflowGraph(graphviz.Digraph):
                     raise ValueError
 
             except ValueError as err:
-                WorkflowGraph._logger.error('{0}: Edges must be a single/list tuple of strings, {1}'.format(self.id, err))
+                type(self)._logger.error('{0}: Edges must be a single/list tuple of strings, {1}'.format(self._id, err))
+
+    @property
+    def style(self):
+        return self._style
+
+    @style.setter
+    def style(self, sty):
+        try:
+            if isinstance(sty, int):
+                self._style = deepcopy(graph_styles[sty])
+            elif isinstance(sty, dict):
+                self._style = deepcopy(sty)
+            else:
+                raise ValueError
+
+            self._style['label'] = self.name
+            if 'graph' in self.style:
+                self.graph_attr.update(self.style['graph'])
+            if 'nodes' in self.style:
+                self.node_attr.update(self.style['nodes'])
+            if 'edges' in self.style:
+                self.edge_attr.update(self.style['edges'])
+
+        except Exception as err:
+            type(self)._logger.error('{0}: Failed to set style, {1}'.format(self._id, err))
 
     def __init__(self, **conf):
-        WorkflowGraph._workflow_id += 1
-        self.id = WorkflowGraph._workflow_id
+        type(self)._workflow_id += 1
+        self._id = type(self)._workflow_id
         self._nodes = []
         self._edges = []
+        self._style = {}
 
-        # graphviz.Digraph does not contain this data members
+        # graphviz.Digraph contains these data members
         self.name = 'workflow'
         self.comment = ''
         self.filename = self.name
@@ -135,6 +141,10 @@ class WorkflowGraph(graphviz.Digraph):
         self.edge_attr = {}
         self.body = []
         self.strict = False
+
+        # remove/ignore ID
+        if '_id' in conf:
+            del conf['_id']
 
         # list of nodes
         if '_nodes' in conf:
@@ -155,6 +165,12 @@ class WorkflowGraph(graphviz.Digraph):
             if isinstance(conf['edges'], list):
                 self.edges = conf['edges'][:]
             del conf['edges']
+
+        # graph style
+        if '_style' in conf:
+            if isinstance(conf['_style'], dict):
+                self.style = conf['_style']
+            del conf['_style']
 
         # graph name used in the source code
         if 'name' not in conf or not isinstance(conf['name'], str):
@@ -217,7 +233,7 @@ class WorkflowGraph(graphviz.Digraph):
             super().__init__(**conf)
 
         except Exception as err:
-            WorkflowGraph._logger.error('{0}: Failed to initialize workflow, {1}'.format(self.id, err))
+            type(self)._logger.error('{0}: Failed to initialize workflow, {1}'.format(self._id, err))
 
     def saves(self):
         try:
@@ -225,7 +241,7 @@ class WorkflowGraph(graphviz.Digraph):
                 super().save()
 
         except Exception as err:
-            WorkflowGraph._logger.warn('{0}: Failed to save workflow, {1}'.format(self.id, err))
+            type(self)._logger.warn('{0}: Failed to save workflow, {1}'.format(self._id, err))
 
     def renders(self):
         try:
@@ -233,57 +249,48 @@ class WorkflowGraph(graphviz.Digraph):
                 super().render(view=True)
 
         except Exception as err:
-            WorkflowGraph._logger.warn('{0}: Failed to render workflow, {1}'.format(self.id, err))
+            type(self)._logger.warn('{0}: Failed to render workflow, {1}'.format(self._id, err))
 
     def __repr__(self):
-        nodes_str = 'Workflow {0}: {1}\n'.format(self.id, self.filename)
+        nodes_str = 'Workflow {0}: {1}\n'.format(self._id, self.filename)
         nodes_str += '\tNodes: {0}\n'.format(str(self.nodes))
         nodes_str += '\tEdges: {0}\n'.format(str(self.edges))
-
         return nodes_str
+        #return self.source
 
     @staticmethod
     def json_load(fn):
-        wf = None
         try:
             with open(fn, 'r') as fd:
                 wf_dict = json.load(fd)
-            wf = WorkflowGraph(**wf_dict)
+            return __class__(**wf_dict)
 
         except Exception as err:
-            WorkflowGraph._logger.error('Failed to load workflow from JSON file ({0}), {1}'.format(fn, err))
-
-        return wf
+            __class__._logger.error('Failed to load workflow from JSON file ({0}), {1}'.format(fn, err))
+            return None
 
     def json_save(self, fn=''):
+        if not fn:
+            fn = self.name + '.json'
+
         try:
-            wf_dict = {}
-            for k,v in self.__dict__.items():
-                # Skip ID to prevent collisions
-                if k not in ['id']:
-                    wf_dict[k] = copy.deepcopy(v)
-
-            if not fn:
-                fn = self.name + '.json'
-
             with open(fn, 'w') as fd:
-                wf_dict = json.dump(wf_dict, fd)
+                json.dump(self.__dict__, fd)
 
         except Exception as err:
-            WorkflowGraph._logger.error('{0}: Failed to dump workflow into JSON file ({1}), {2}'.format(self.id, fn, err))
+            type(self)._logger.error('{0}: Failed to dump workflow into JSON file ({1}), {2}'.format(self._id, fn, err))
 
-    def style(self, styles={}):
-        if styles:
-            if 'graph' in styles:
-                self.graph_attr.update(styles['graph'])
-            if 'nodes' in styles:
-                self.node_attr.update(styles['nodes'])
-            if 'edges' in styles:
-                self.edge_attr.update(styles['edges'])
-        else:
-            if 'graph' in WorkflowGraph._styles:
-                self.graph_attr.update(WorkflowGraph._styles['graph'])
-            if 'nodes' in WorkflowGraph._styles:
-                self.node_attr.update(WorkflowGraph._styles['nodes'])
-            if 'edges' in WorkflowGraph._styles:
-                self.edge_attr.update(WorkflowGraph._styles['edges'])
+    @staticmethod
+    def instances():
+        return __class__._workflow_id
+
+    def rename(self, name):
+        try:
+            if not isinstance(name, str):
+                raise ValueError
+
+            self.name = name
+            self.filename = self.name
+
+        except Exception as err:
+            type(self)._logger.error('{0}: Failed to rename workflow, {1}'.format(self._id, err))
