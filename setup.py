@@ -16,7 +16,8 @@ install_requirements = [
     'mpi4py>=3.0',        # requires a MPI library (e.g., OpenMPI)
     'networkx>=1.11',
     'configparser>=3.5',
-    'Jinja2>=2.9'
+    'Jinja2>=2.9',
+    'graphviz>=0.8.3'
 ]
 
 # A list of strings specifying what other distributions need to be present

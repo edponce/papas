@@ -9,32 +9,13 @@ import os
 # import subprocess
 import json
 import yaml
-import logging
+import utils.logger
 
 
-def init_logger():
-    """Configure logging"""
-    logger = logging.getLogger(__name__)
-    logger.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(fmt='%(asctime)s - %(name)s - '
-                                      '%(levelname)s - %(message)s',
-                                  datefmt='%Y-%m-%d %H:%M:%S')
-    log_file_handler = logging.FileHandler(__name__ + '.log')
-    log_file_handler.setLevel(logging.DEBUG)
-    log_file_handler.setFormatter(formatter)
-    logger.addHandler(log_file_handler)
-    log_stream_handler = logging.StreamHandler()
-    log_stream_handler.setLevel(logging.INFO)
-    log_stream_handler.setFormatter(formatter)
-    logger.addHandler(log_stream_handler)
-
-    return logger
-
-
-class PaPaSDriver:
+class PaPaSDriver(object):
 
     def __init__(self, **conf):
-        self.logger = init_logger()
+        self.logger = utils.logger.init_logger('papas')
         self.papas_data = {}
         self.app_data = {}
 
