@@ -3,8 +3,8 @@
 SPHINXBUILD   = python3 -m sphinx
 SPHINXPROJ    =
 SOURCEDIR     = .
-BUILDDIR      = build
-SPHINXOPTS    =
+BUILDDIR      = _build
+SPHINXOPTS    = -W
 
 
 .PHONY: help clean Makefile

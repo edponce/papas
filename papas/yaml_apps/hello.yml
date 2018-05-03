@@ -1,6 +1,0 @@
-program:
-    ./apps/hello.py
-
-params:
-    --xparam: '10'
-

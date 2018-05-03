@@ -15,6 +15,9 @@ install_requirements = [
     'configparser>=3.5',
     'mpi4py>=3.0',        # requires a MPI library (e.g., OpenMPI)
     'networkx>=1.11',
+    'configparser>=3.5',
+    'Jinja2>=2.9',
+    'graphviz>=0.8.3'
 ]
 
 # A list of strings specifying what other distributions need to be present
@@ -22,7 +25,7 @@ install_requirements = [
 setup_requirements = [
     'setuptools>=38.5',
     'pip>=9.0',
-    'wheel>=0.30',
+    'wheel>=0.30'
 ]
 
 # A list of strings specifying what other distributions need to be present
@@ -35,7 +38,7 @@ with open('tests_requirements.txt', 'r') as tests_req:
 # automatically installed unless another package depends on them.
 extras_requirements = {
     'lint': ['flake8>=3.5'],
-    'reST': ['Sphinx>=1.6'],
+    'reST': ['Sphinx>=1.6']
 }
 
 setup(
@@ -62,11 +65,11 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Topic :: Utilities',
-        'Topic :: Software Development :: Libraries',
+        'Topic :: Software Development :: Libraries'
     ],
     platforms=['Linux'],
     zip_safe=False,
-    python_requires='>=3',
+    python_requires='>=3.2',
     include_package_data=True,
     packages=find_packages(exclude=['tests']),
     package_data={},
@@ -74,5 +77,5 @@ setup(
     setup_requires=setup_requirements,
     extras_require=extras_requirements,
     tests_require=tests_requirements,
-    test_suite='tests',
+    test_suite='tests'
 )

@@ -1,16 +1,15 @@
 file_extensions:
     COMMENTS: Key-value pairs represent file extension with default program to run. An empty program value represents an executable file (e.g., compiled languages). These are only used if program is not provided in application's configuration. Only need to provide lower-case version of extensions, but actual files can have lower/upper/mixed-cases.
-    .bin:
-    .java: java
-    .jar: java -jar
-    .py: python
-    .py3: python3
-    .m: matlab -nodisplay -nojvm -r run('%');exit(0);
-    .r: Rscript
-    .rb: ruby
-    .sh: sh
-    .bash: bash
-    .zsh: zsh
+    bin:
+    java: java
+    jar: java -jar
+    py: python
+    py3: python3
+    m: "matlab -nodisplay -nojvm -r run('%');exit(0);"
+    r: Rscript
+    rb: ruby
+    sh: sh
+    bash: bash
+    zsh: zsh
 
-program_executable: [.bin, .py, .py3, .sh, .bash, .zsh]
-
+program_executable: [bin, py, py3, sh, bash, zsh]
