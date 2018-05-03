@@ -4,7 +4,7 @@
 __all__ = ['WorkflowGraph']
 
 
-import utils.logger
+from utils.logger import logger
 from graphviz import Digraph
 from copy import deepcopy
 import json
@@ -13,8 +13,8 @@ from graphs.styles import graph_styles
 
 class WorkflowGraph(Digraph):
 
-    _workflow_id = 0
-    _logger = utils.logger.init_logger('WorkflowGraph')
+    _wid = 0
+    _logger = logger
 
     @property
     def nodes(self):
@@ -122,8 +122,8 @@ class WorkflowGraph(Digraph):
             type(self)._logger.error('{0}: Failed to set style, {1}'.format(self._id, err))
 
     def __init__(self, **conf):
-        type(self)._workflow_id += 1
-        self._id = type(self)._workflow_id
+        type(self)._wid += 1
+        self._id = type(self)._wid
         self._nodes = []
         self._edges = []
         self._style = {}
@@ -251,6 +251,10 @@ class WorkflowGraph(Digraph):
         except Exception as err:
             type(self)._logger.warn('{0}: Failed to render workflow, {1}'.format(self._id, err))
 
+    def view(self):
+        if self.nodes:
+            super().view(cleanup=True)
+
     def __repr__(self):
         nodes_str = 'Workflow {0}: {1}\n'.format(self._id, self.filename)
         nodes_str += '\tNodes: {0}\n'.format(str(self.nodes))
@@ -282,7 +286,7 @@ class WorkflowGraph(Digraph):
 
     @staticmethod
     def instances():
-        return __class__._workflow_id
+        return __class__._wid
 
     def rename(self, name):
         try:

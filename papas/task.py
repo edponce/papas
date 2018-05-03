@@ -1,29 +1,44 @@
 #!/usr/bin/env python3
 
 
-__all__ = ['Task']
+__all__ = ['Task', 'PTask']
 
 
-import utils.logger
+from utils.logger import logger
 
 
 class Task(object):
+    """Task instance with a specific set of resolved parameters"""
 
-    def __init__(self, **conf):
-        self.logger = utils.logger.init_logger('task')
-        self.task_id = -1
-        self.task_conf = {}
+    _tid = 0
+    _logger = logger
 
-        if 'task_id' in conf:
-            self.task_id = conf['task_id']
-        if 'conf' in conf:
-            self.task_conf = conf['conf']
+    def __init__(self, **kwargs):
+        self.conf = {}
 
-    def print(self):
-        if self.task_conf:
-            print(self.task_conf)
-        else:
-            self.logger.debug('No task configuration data to print')
+        if 'conf' in kwargs:
+            self.conf = kwargs['conf']
 
-    def __str__(self):
-        self.print()
+    def __repr__(self):
+        return str(self.conf)
+
+
+class PTask(object):
+    """Task instance with unresolved parameters representing a list of Tasks"""
+
+    _tid = 0
+    _logger = logger
+
+    def __init__(self, **kwargs):
+        self.conf = {}
+        self.tasks = []
+
+        if 'conf' in kwargs:
+            self.conf = kwargs['conf']
+
+    def print_tasks(self):
+        for t in self.tasks:
+            print(t)
+
+    def __repr__(self):
+        return str(self.conf)

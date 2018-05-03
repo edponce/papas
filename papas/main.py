@@ -21,7 +21,7 @@ python3 papas.py -a tasks_conf/YAML_conf/helloWorld.yml
 # import sys
 import os
 import argparse
-from papas import PaPaSDriver
+from papas import PaPaS
 
 
 default_conf_file = 'papas_conf/PaPaS.yml'
@@ -57,46 +57,6 @@ def parse_args():
     return parser.parse_args()
 
 
-def validate_file(fn, *, dir=False, read=True, write=False, execute=False):
-    """Check access properties of a given file or directory, if it exists
-    Only checks for properties that are set to True, others are ignored.
-
-    Args:
-        fn (str): File or directory to check
-        dir (bool, optional): Specify if it is a file or directory
-            (default is False)
-        read (bool, optional): Check if path is readable
-            (default is True)
-        write (bool, optional): Check if path is writeable
-            (default is False)
-        execute (bool, optional): Check if path is executable
-            (default is False)
-
-    Returns:
-        bool: True if all properties set are supported, else False
-
-    Todo:
-        * Remove print messages, useful for debugging only
-    """
-    prop_msg = []
-    if not dir and not os.path.isfile(fn):
-        prop_msg += ['file does not exists']
-    elif dir and not os.path.isdir(fn):
-        prop_msg += ['directory does not exists']
-    else:
-        if read and not os.access(fn, os.R_OK):
-            prop_msg += ['is not readable']
-        if write and not os.access(fn, os.W_OK):
-            prop_msg += ['is not writable']
-        if execute and not os.access(fn, os.X_OK):
-            prop_msg += ['is not executable']
-
-    if prop_msg:
-        print("'%s' %s" % (fn, ', '.join(prop_msg)))
-        return False
-    return True
-
-'''
 def process_app_conf(conf_data, app_conf_data):
     """Parse and process application configuration data
 
@@ -169,11 +129,10 @@ def process_app_conf(conf_data, app_conf_data):
 
     print(cmd)
     subprocess.run(cmd)
-'''
 
 
 if __name__ == '__main__':
     args = parse_args()
-    pp = PaPaSDriver(**vars(args))
-    pp.print_papas()
+    pp = PaPaS(**vars(args))
+    print(pp)
     pp.print_app()

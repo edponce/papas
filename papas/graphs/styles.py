@@ -2,6 +2,7 @@
 
 
 # https://www.graphviz.org/doc/info/attrs.html#a:stylesheet
+# list of dictionaries
 graph_styles = [
     {
         'graph': {
