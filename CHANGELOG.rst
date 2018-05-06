@@ -2,16 +2,15 @@
 CHANGELOG
 =========
 
-
-0.4 (2018-03-14)
-================
+0.2 (2018-5/3)
+==============
 
 * None
 
 Features
 --------
 
-* Added code coverage support for test suite
+* Added graphviz support
 
 Bug fixes
 ---------
@@ -19,9 +18,11 @@ Bug fixes
 * None
 
 
-0.2 (2018-03-08)
+0.1 (2018-03-08)
 ================
 
 * Initial implementation with simple INI/JSON/YAML configurations
 
 * Initial documentation
+
+* Added code coverage support for test suite
