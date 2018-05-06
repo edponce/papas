@@ -13,3 +13,4 @@ ref/
 *.bak
 *.log
 flake8.out
+pypi.txt
