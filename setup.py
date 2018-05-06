@@ -41,6 +41,13 @@ extras_requirements = {
     'reST': ['Sphinx>=1.6']
 }
 
+
+# For PyPI, the 'download_url' is a link to a hosted repository.
+# Github hosting creates tarballs for download at
+#   https://github.com/{username}/{package}/archive/{tag}.tar.gz.
+# To create a git tag
+#   git tag {papas.__version__} -m 'Adds a tag so that we can put package on PyPI'
+#   git push --tags origin master
 setup(
     name=papas.__title__,
     version=papas.__version__,
@@ -48,7 +55,7 @@ setup(
     long_description=long_description,
     keywords=papas.__keywords__,
     url=papas.__url__,
-    download_url=papas.__url__,
+    download_url='{}/archive/{}.tar.gz'.format(papas.__url__, papas.__version__),
     author=papas.__author__,
     author_email=papas.__author_email__,
     license=papas.__license__,

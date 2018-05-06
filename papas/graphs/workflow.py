@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 
+"""
+TODO:
+    * make Digraph be an object, not parent
+    * clear nodes and edges
+    * allow attribute updates to edges
+"""
 
 __all__ = ['WorkflowGraph']
 
@@ -35,6 +41,11 @@ class WorkflowGraph(Digraph):
                 if isinstance(node, tuple) and len(node) == 2:
                     if (isinstance(node[0], str) and node[0]) \
                         and isinstance(node[1], dict):
+                        """
+                        TODO: allow edge updates
+                        Probably need to clear graph, copy contents (except) and add
+                        new.
+                        """
                         if node[0] not in self.nodes:
                             self._nodes.append(node[0])
                             self.node(node[0], **node[1])
@@ -77,6 +88,11 @@ class WorkflowGraph(Digraph):
                 if (isinstance(edge[0], tuple) and len(edge[0]) == 2) \
                     and isinstance(edge[1], dict):
                     if all([(isinstance(e, str) and e) for e in edge[0]]):
+                        """
+                        TODO: allow edge updates
+                        Probably need to clear graph, copy contents (except) and add
+                        new.
+                        """
                         if edge[0] not in self.edges:
                             self.nodes = list(edge[0])
                             self._edges.append(edge[0])
@@ -252,8 +268,12 @@ class WorkflowGraph(Digraph):
             type(self)._logger.warn('{0}: Failed to render workflow, {1}'.format(self._id, err))
 
     def view(self):
-        if self.nodes:
-            super().view(cleanup=True)
+        try:
+            if self.nodes:
+                super().view(cleanup=True)
+
+        except Exception as err:
+            type(self)._logger.warn('{0}: Failed to render workflow, {1}'.format(self._id, err))
 
     def __repr__(self):
         nodes_str = 'Workflow {0}: {1}\n'.format(self._id, self.filename)
@@ -298,3 +318,10 @@ class WorkflowGraph(Digraph):
 
         except Exception as err:
             type(self)._logger.error('{0}: Failed to rename workflow, {1}'.format(self._id, err))
+
+    def clear(self, keep_style=False):
+        super().clear(keep_style)
+        self._nodes = []
+        self._edges = []
+        if not keep_style:
+            self._style = {}

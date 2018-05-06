@@ -1,7 +1,7 @@
 """PaPaS module"""
 
 __title__ = 'PaPaS'
-__version__ = '1.0'
+__version__ = '0.2'
 __description__ = 'A generic framework for parallel parameter studies'
 __keywords__ = ['parameter sweep', 'workflows', 'automation']
 __url__ = 'https://github.com/edponce/papas'
