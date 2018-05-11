@@ -1,10 +1,18 @@
 .. highlight:: shell
 
+=========  ========  =======
+Travis CI  Coverage  License
+=========  ========  =======
 .. image:: https://travis-ci.org/edponce/papas.svg?branch=master
    :target: https://travis-ci.org/edponce/papas
 
 .. image:: https://coveralls.io/repos/github/edponce/papas/badge.svg?branch=master
    :target: https://coveralls.io/github/edponce/papas?branch=master
+
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg
+   :target: https://raw.githubusercontent.com/edponce/papas
+=========  ========  =======
+
 
 ======
 README
