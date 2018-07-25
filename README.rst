@@ -179,6 +179,7 @@ The following is the general specification of rules for configuring parameter st
   levels (e.g., ${*task:keyword*} and ${*task:keyword:value*}).
 
 The list below presents a list of common keywords corresponding to PaPaS WDL:
+
 - **command** - string representing the command line to run
 - **name** - string describing the task
 - **environ** - dictionary of environment variables where
